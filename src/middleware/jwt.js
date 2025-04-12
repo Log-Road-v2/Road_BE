@@ -6,15 +6,17 @@ const { redisCli } = require("../redis");
 
 configDotenv();
 
-const validatorAccess = async (req, res, next) => {
+const validateAccess = async (req, res, next) => {
   try {
-    const authorization = req.get("authorization")?.split(" ")[1];
-    if (!authorization) {
+    const authorization = req.get("authorization");
+    if (!authorization || !authorization.startsWith("Bearer ")) {
       return res.status(401).json({
         error: "JWT 유효성 검증 실패"
       });
     }
-    if (!isJwt(authorization)) {
+
+    const token = authorization.split(" ")[1];
+    if (!isJwt(token)) {
       return res.status(401).json({
         error: "JWT 유효성 검증 실패"
       });
@@ -22,12 +24,13 @@ const validatorAccess = async (req, res, next) => {
 
     const salt = process.env.SECRET_OR_PRIVATE;
 
-    req.payload = jwt.verify(authorization, salt, {
+    req.payload = jwt.verify(token, salt, {
       algorithms: "HS256"
     });
+
     next();
   } catch (err) {
-    console.error(e);
+    console.error(err);
     return res.status(400).json({
       error: err
     });
@@ -75,6 +78,6 @@ const validateWithMail = async (req, res) => {
 };
 
 module.exports = {
-  validatorAccess,
+  validateAccess,
   validateWithMail
 };

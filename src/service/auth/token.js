@@ -13,8 +13,14 @@ const generateToken = async (id, isAccess) => {
 };
 
 const refresh = async (req, res) => {
-  const token = await req.get("authorization").split(" ")[1];
+  const authorization = await req.get("authorization");
+  if (!authorization || !authorization.startsWith("Bearer ")) {
+    return res.status(400).json({
+      error: "확인할 수 없는 토큰입니다"
+    });
+  }
 
+  const token = authorization.split(" ")[1];
   if (!req.payload) {
     return res.status(400).json({
       error: "확인할 수 없는 토큰입니다"
@@ -32,7 +38,7 @@ const refresh = async (req, res) => {
 
     return res.status(200).json({
       accessToken: accessToken,
-      refreshToken: value
+      refreshToken: token
     });
   });
 };
