@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { isJwt } = require("validator");
 const { configDotenv } = require("dotenv");
+const { createTransport } = require("nodemailer");
+const { redisCli } = require("../redis");
 
 configDotenv();
 
@@ -32,6 +34,47 @@ const validatorAccess = async (req, res, next) => {
   }
 };
 
+const validateWithMail = async (req, res) => {
+  const emailId = process.env.EMAIL_ID;
+  const emailPw = process.env.EMAIL_PW;
+
+  const { email } = req.body;
+
+  const transport = createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: emailId,
+      pass: emailPw
+    }
+  });
+
+  try {
+    const random = Math.random().toString(36).slice(2, 10);
+
+    await transport.sendMail({
+      from: emailId,
+      to: email,
+      subject: "Road 임시 비밀번호",
+      text: `임시 비밀번호는 ${random}`
+    });
+
+    redisCli.set(email, random);
+
+    return res.status(200).json({
+      message: "메일이 발송되었습니다."
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: err
+    });
+  }
+};
+
 module.exports = {
-  validatorAccess
+  validatorAccess,
+  validateWithMail
 };
