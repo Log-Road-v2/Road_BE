@@ -1,15 +1,15 @@
 const jwt = require("jsonwebtoken");
 const { redisCli } = require("../../redis");
 
-const generateAccessToken = async (id, isAccess) => {
+const generateToken = async (id, isAccess) => {
   const salt = process.env.SECRET_OR_PRIVATE;
 
-  const access = jwt.sign({ id }, salt, {
+  const token = jwt.sign({ id }, salt, {
     algorithm: "HS256",
     expiresIn: isAccess ? "2h" : "7d"
   });
 
-  return access;
+  return token;
 };
 
 const refresh = async (req, res) => {
@@ -27,7 +27,7 @@ const refresh = async (req, res) => {
         error: err
       });
     }
-    const accessToken = await generateAccessToken(value, true);
+    const accessToken = await generateToken(value, true);
     redisCli.set(value, accessToken);
 
     return res.status(200).json({
@@ -38,6 +38,6 @@ const refresh = async (req, res) => {
 };
 
 module.exports = {
-  generateAccessToken,
+  generateToken,
   refresh
 };
