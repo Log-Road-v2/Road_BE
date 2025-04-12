@@ -6,7 +6,7 @@ const generateAccessToken = async (id, isAccess) => {
 
   const access = jwt.sign({ id }, salt, {
     algorithm: "HS256",
-    expiresIn: isAccess ? "30s" : "7d"
+    expiresIn: isAccess ? "2h" : "7d"
   });
 
   return access;
