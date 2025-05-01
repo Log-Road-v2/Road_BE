@@ -1,9 +1,7 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { prisma, Role } from '../../config/prisma';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
-
-const prisma = new PrismaClient();
 
 export const signUp = async (req: Request, res: Response) => {
   const { role, email, password, grade, classNumber, studentNumber, name } = req.body;

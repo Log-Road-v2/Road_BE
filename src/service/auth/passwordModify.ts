@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../config/prisma';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
 
 export const passwordModify = async (req: Request, res: Response) => {
   try {

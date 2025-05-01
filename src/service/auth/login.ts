@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../config/prisma';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
 import { generateToken } from './token';
-
-const prisma = new PrismaClient();
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
