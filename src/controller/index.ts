@@ -1,5 +1,8 @@
 import express from 'express';
+import auth from './auth';
 
-const router = express();
+const app = express();
 
-export default router;
+app.use('/auth', auth);
+
+export default app;
