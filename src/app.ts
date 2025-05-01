@@ -4,7 +4,7 @@ import { configDotenv } from 'dotenv';
 import router from './controller';
 
 configDotenv();
-const port: Number = Number(process.env.PORT!) ?? 8080;
+const port: Number = Number(process.env.PORT!) || 8080;
 const corsOptions: CorsOptions = {
   origin: 'localhost',
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
