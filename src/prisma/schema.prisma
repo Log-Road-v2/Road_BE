@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum StudentState {
+  SCHOOL
+  GRADURATION
+  LEAVE
+  DROP
+  KICK
+}
+
+enum ContestState {
+  BEFORE
+  NOW
+  VOTING
+  PENDING
+  FINISHED
+}
+
+enum Author {
+  PERSONAL
+  TEAM
+}
+
+enum ProjectState {
+  WRITING
+  PENDING
+  APPROVAL
+  REJECTED
+  MODIFY
+}
+
+model User {
+  id         BigInt  @id @default(autoincrement()) @db.BigInt
+  email      String  @unique @db.VarChar(32)
+  password   String
+  name       String  @db.VarChar(6)
+  role       Role
+
+  student    Student?
+  project    Project[]
+  vote       Vote[]
+  mark       Mark[]
+}
+
+model Student {
+  id            BigInt       @id @default(autoincrement()) @db.BigInt
+  userId        BigInt?      @unique @db.BigInt
+  generation    String       @db.Char(2)
+  name          String       @db.VarChar(6)
+  grade         String?      @db.Char(1)
+  classNumber   String?      @db.Char(1)
+  studentNumber String?      @db.Char(2)
+  state         StudentState @default(SCHOOL)
+
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  member        Member[]
+}
+
+model Contest {
+  id        BigInt       @id @default(autoincrement()) @db.BigInt
+  name      String       @db.VarChar(30)
+  startDate DateTime
+  endDate   DateTime
+  purpose   String?      @db.VarChar(300)
+  state     ContestState @default(BEFORE)
+
+  award Award[]
+  project Project[]
+}
+
+model Project {
+  id             BigInt       @id @default(autoincrement()) @db.BigInt
+  contestId      BigInt       @db.BigInt
+  writerId       BigInt?      @db.BigInt
+  projectName    String       @db.VarChar(30)
+  authorCategory Author
+  teamName       String?      @db.VarChar(30)
+  skills         String?      @db.VarChar(600)
+  introduction   String?      @db.VarChar(100)
+  description    String?      @db.Text
+  startDate      DateTime     @db.Date
+  endDate        DateTime     @db.Date
+  image          String?
+  vedio          String?
+  state          ProjectState @default(WRITING)
+
+  contest        Contest      @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [writerId], references: [id], onDelete: SetNull)
+  member         Member[]
+  awardProject   AwardProject[]
+  vote           Vote[]
+  mark           Mark[]
+  feedback       Feedback?
+}
+
+model Award {
+  id           BigInt  @id @default(autoincrement()) @db.BigInt
+  contestId    BigInt  @db.BigInt
+  name         String  @db.VarChar(24)
+  awardCount   Int
+
+  contest      Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  awardProject AwardProject[]
+}
+
+model AwardProject {
+  projectId BigInt  @db.BigInt
+  awardId   BigInt  @db.BigInt
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  award     Award   @relation(fields: [awardId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, awardId])
+}
+
+model Member {
+  id        BigInt    @id @default(autoincrement()) @db.BigInt
+  studentId BigInt?   @db.BigInt
+  projectId BigInt    @db.BigInt
+
+  student   Student?  @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Vote {
+  id        Int     @id @default(autoincrement())
+  projectId BigInt  @db.BigInt
+  userId    BigInt  @db.BigInt
+  rank      String  @db.VarChar(1)
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Mark {
+  id        BigInt  @id @default(autoincrement()) @db.BigInt
+  projectId BigInt  @db.BigInt
+  userId    BigInt  @db.BigInt
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  projectId BigInt  @id @db.BigInt
+  content   String  @db.VarChar(100)
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
