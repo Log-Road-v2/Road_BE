@@ -12,4 +12,14 @@ const redis = new Redis({
   password: process.env.REDIS_PASSWORD
 });
 
+redis.on('connect', () => {
+  console.log('Redis has initted');
+});
+redis.on('error', (err) => {
+  console.error('Redis connection error:', err);
+});
+redis.on('reconnecting', () => {
+  console.log('Reconnecting redis');
+});
+
 export default redis;
