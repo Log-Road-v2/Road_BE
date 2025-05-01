@@ -26,7 +26,7 @@ export const login = async (req: Request, res: Response) => {
         message: '존재하지 않는 이메일'
       });
     }
-    if (!bcrypt.compareSync(password, thisUser.password)) {
+    if (!(await bcrypt.compare(password, thisUser.password))) {
       return res.status(409).json({
         message: '비밀번호 불일치'
       });

@@ -19,7 +19,7 @@ export const passwordModify = async (req: Request, res: Response) => {
       });
     }
 
-    const hashed = bcrypt.hashSync(newPassword, 10);
+    const hashed = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({
       where: { email },
       data: { password: hashed }

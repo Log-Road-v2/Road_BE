@@ -69,7 +69,7 @@ export const signUp = async (req: Request, res: Response) => {
       }
     }
 
-    const hash = bcrypt.hashSync(password, 10);
+    const hash = await bcrypt.hash(password, 10);
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
