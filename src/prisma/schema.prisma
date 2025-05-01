@@ -15,7 +15,7 @@ enum Role {
 
 enum StudentState {
   SCHOOL
-  GRADURATION
+  GRADUATION
   LEAVE
   DROP
   KICK
@@ -94,7 +94,7 @@ model Project {
   startDate      DateTime     @db.Date
   endDate        DateTime     @db.Date
   image          String?
-  vedio          String?
+  video          String?
   state          ProjectState @default(WRITING)
 
   contest        Contest      @relation(fields: [contestId], references: [id], onDelete: Cascade)
@@ -143,6 +143,8 @@ model Vote {
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
 }
 
 model Mark {
@@ -152,6 +154,8 @@ model Mark {
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
 }
 
 model Feedback {

@@ -2,7 +2,7 @@
 CREATE TYPE "Role" AS ENUM ('STUDENT', 'TEACHER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "StudentState" AS ENUM ('SCHOOL', 'GRADURATION', 'LEAVE', 'DROP', 'KICK');
+CREATE TYPE "StudentState" AS ENUM ('SCHOOL', 'GRADUATION', 'LEAVE', 'DROP', 'KICK');
 
 -- CreateEnum
 CREATE TYPE "ContestState" AS ENUM ('BEFORE', 'NOW', 'VOTING', 'PENDING', 'FINISHED');
@@ -64,7 +64,7 @@ CREATE TABLE "Project" (
     "startDate" DATE NOT NULL,
     "endDate" DATE NOT NULL,
     "image" TEXT,
-    "vedio" TEXT,
+    "video" TEXT,
     "state" "ProjectState" NOT NULL DEFAULT 'WRITING',
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
@@ -129,6 +129,12 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Vote_projectId_userId_key" ON "Vote"("projectId", "userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Mark_projectId_userId_key" ON "Mark"("projectId", "userId");
 
 -- AddForeignKey
 ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
