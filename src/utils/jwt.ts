@@ -7,7 +7,7 @@ export const signJWT = (payload: object, expiresIn: ms.StringValue | number): st
     throw new Error('private key is not defined');
   }
   const signOptions: SignOptions = {
-    algorithm: 'RS256',
+    algorithm: 'HS256',
     expiresIn: expiresIn
   };
   return jwt.sign(payload, privateKey, signOptions);
@@ -15,8 +15,14 @@ export const signJWT = (payload: object, expiresIn: ms.StringValue | number): st
 
 export const verifyJWT = (token: string) => {
   try {
-    const publicKey = process.env.PUBLIC_KEY || '';
-    const decoded = jwt.verify(token, publicKey);
+    const privateKey = process.env.PRIVATE_KEY;
+    if (!privateKey) {
+      return {
+        payload: null,
+        expired: 'private key is not defined'
+      };
+    }
+    const decoded = jwt.verify(token, privateKey);
     return {
       payload: decoded,
       expired: false
