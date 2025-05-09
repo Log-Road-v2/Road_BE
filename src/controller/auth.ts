@@ -1,22 +1,27 @@
 import express, { Request, Response } from 'express';
 import auth from '../service/auth';
+import { apiLimit } from '../middleware/limit';
+import { verifyJWT } from '../middleware/jwt';
 
 const app = express();
 
-app.post('/signup', (req: Request, res: Response) => {
+app.post('/signup', apiLimit, (req: Request, res: Response) => {
   auth.signUp(req, res);
 });
-app.post('/login', (req: Request, res: Response) => {
+app.post('/login', apiLimit, (req: Request, res: Response) => {
   auth.login(req, res);
 });
-app.post('/refresh', (req: Request, res: Response) => {
+app.post('/refresh', apiLimit, verifyJWT, (req: Request, res: Response) => {
   auth.refresh(req, res);
 });
-app.post('/email', (req: Request, res: Response) => {
+app.post('/email', apiLimit, (req: Request, res: Response) => {
   auth.sendMail(req, res);
 });
-app.patch('/password', (req: Request, res: Response) => {
+app.patch('/password', apiLimit, (req: Request, res: Response) => {
   auth.passwordModify(req, res);
+});
+app.post('/logout', apiLimit, verifyJWT, (req: Request, res: Response) => {
+  auth.logout(req, res);
 });
 
 export default app;

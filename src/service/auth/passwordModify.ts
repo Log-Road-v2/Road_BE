@@ -2,8 +2,9 @@ import { prisma } from '../../config/prisma';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { Request, Response } from 'express';
+import { PasswordModifyRequest } from '../../types/auth';
 
-export const passwordModify = async (req: Request, res: Response) => {
+export const passwordModify = async (req: Request<{}, {}, PasswordModifyRequest>, res: Response) => {
   try {
     const { email, code, newPassword } = req.body;
     const mailCode = await redis.get(email);

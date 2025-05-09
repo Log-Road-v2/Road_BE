@@ -4,8 +4,9 @@ import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
 import { generateToken } from './token';
+import { LoginRequest, LoginResponse } from '../../types/auth';
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | { message: string }>) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -36,7 +37,7 @@ export const login = async (req: Request, res: Response) => {
     const refreshToken = await generateToken(Date.now().toString(), false);
 
     await redis.set(thisUser.id.toString(), accessToken, 'EX', 7200);
-    await redis.set(refreshToken, thisUser.id.toString(), 'EX', 604800);
+    await redis.set(`refresh ${refreshToken}`, thisUser.id.toString(), 'EX', 604800);
 
     return res.status(200).json({
       role: thisUser.role,

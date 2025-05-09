@@ -2,8 +2,9 @@ import { prisma, Role } from '../../config/prisma';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
+import { SignUpRequest } from '../../types/auth';
 
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response) => {
   const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
 
   if (!role || !email || !password || !name) {
@@ -71,7 +72,7 @@ export const signUp = async (req: Request, res: Response) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    await prisma.$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
           email: email,
