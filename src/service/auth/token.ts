@@ -1,5 +1,5 @@
 import redis from '../../config/redis';
-import { RefreshResponse } from '../../types/auth';
+import { TokenResponse } from '../../types/auth';
 import { signJWT } from '../../utils/jwt';
 import { Request, Response } from 'express';
 
@@ -8,7 +8,7 @@ export const generateToken = async (id: string, isAccess: boolean) => {
   return token;
 };
 
-export const refresh = async (req: Request, res: Response<RefreshResponse | { message: string }>) => {
+export const refresh = async (req: Request, res: Response<TokenResponse | { message: string }>) => {
   const authorization = req.get('Authorization');
   if (!authorization) {
     return res.status(400).json({

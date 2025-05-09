@@ -10,20 +10,18 @@ export interface SignUpRequest {
   studentNumber?: string;
 }
 
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
-export interface LoginResponse {
+export interface LoginResponse extends TokenResponse {
   role: Role;
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface RefreshResponse {
-  accessToken: string;
-  refreshToken: string;
 }
 
 export interface SendMailRequest {
