@@ -17,7 +17,7 @@ export const refresh = async (req: Request, res: Response<RefreshResponse | { me
   }
   const token = authorization.split(' ')[1];
 
-  const value = await redis.get(token);
+  const value = await redis.get(`refresh ${token}`);
   if (!value) {
     return res.status(400).json({
       message: '만료된 토큰'

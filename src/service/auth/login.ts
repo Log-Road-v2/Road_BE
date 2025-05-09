@@ -37,7 +37,7 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<Lo
     const refreshToken = await generateToken(Date.now().toString(), false);
 
     await redis.set(thisUser.id.toString(), accessToken, 'EX', 7200);
-    await redis.set(refreshToken, thisUser.id.toString(), 'EX', 604800);
+    await redis.set(`refresh ${refreshToken}`, thisUser.id.toString(), 'EX', 604800);
 
     return res.status(200).json({
       role: thisUser.role,
