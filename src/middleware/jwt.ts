@@ -15,7 +15,7 @@ export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFu
       return;
     }
     const authorization = req.get('Authorization');
-    if (!authorization) {
+    if (!authorization || !authorization.startsWith('Bearer ')) {
       res.status(401).json({
         message: '토큰 유효성 검사 실패'
       });
