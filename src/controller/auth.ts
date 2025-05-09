@@ -20,5 +20,8 @@ app.post('/email', apiLimit, (req: Request, res: Response) => {
 app.patch('/password', apiLimit, (req: Request, res: Response) => {
   auth.passwordModify(req, res);
 });
+app.post('/logout', apiLimit, verifyJWT, (req: Request, res: Response) => {
+  auth.logout(req, res);
+});
 
 export default app;
