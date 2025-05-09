@@ -1,8 +1,9 @@
 import redis from '../../config/redis';
 import { Request, Response } from 'express';
 import { createTransport } from 'nodemailer';
+import { SendMailRequest } from '../../types/auth';
 
-export const sendMail = async (req: Request, res: Response) => {
+export const sendMail = async (req: Request<{}, {}, SendMailRequest>, res: Response) => {
   const emailId = process.env.EMAIL_ID;
   const emailPw = process.env.EMAIL_PW;
 

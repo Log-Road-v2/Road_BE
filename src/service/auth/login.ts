@@ -4,8 +4,9 @@ import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
 import { generateToken } from './token';
+import { LoginRequest, LoginResponse } from '../../types/auth';
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | { message: string }>) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
