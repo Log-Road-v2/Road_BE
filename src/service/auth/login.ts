@@ -5,8 +5,9 @@ import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
 import { generateToken } from './token';
 import { LoginRequest, LoginResponse } from '../../types/auth';
+import { BasicRespone } from '../../types';
 
-export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | { message: string }>) => {
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | BasicRespone>) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
