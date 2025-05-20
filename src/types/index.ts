@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { ParsedQs } from 'qs';
 
-export interface BasicRespone {
+export interface BasicResponse {
   message: string;
 }
 

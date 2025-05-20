@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import redis from '../../config/redis';
-import { AuthenticatedRequest, BasicRespone, REDIS_KEY } from '../../types';
+import { AuthenticatedRequest, BasicResponse, REDIS_KEY } from '../../types';
 
-export const logout = async (req: AuthenticatedRequest, res: Response<BasicRespone>) => {
+export const logout = async (req: AuthenticatedRequest, res: Response<BasicResponse>) => {
   try {
     const payload = req.payload;
     if (!payload || payload.type !== 'access') {
