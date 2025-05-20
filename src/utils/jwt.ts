@@ -13,7 +13,7 @@ const signJWT = (payload: object, expiresIn: ms.StringValue | number): string =>
   return jwt.sign(payload, privateKey, signOptions);
 };
 
-export const generateToken = (id: string, sub: string, isAccess: boolean) => {
+export const generateToken = (id: string, sub: string, isAccess: boolean): string => {
   const token = signJWT(
     {
       id,
