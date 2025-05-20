@@ -47,7 +47,7 @@ export const refresh = async (req: AuthenticatedRequest, res: Response<TokenResp
     });
   } catch (err) {
     return res.status(500).json({
-      message: '서버 에러 발생생'
+      message: '서버 에러 발생'
     });
   }
 };
