@@ -1,15 +1,15 @@
 import redis from '../../config/redis';
-import { BasicRespone } from '../../types';
+import { AuthenticatedRequest, BasicRespone } from '../../types';
 import { TokenResponse } from '../../types/auth';
 import { signJWT } from '../../utils/jwt';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 export const generateToken = async (id: string, isAccess: boolean) => {
   const token = signJWT({ id }, isAccess ? '2h' : '7d');
   return token;
 };
 
-export const refresh = async (req: Request, res: Response<TokenResponse | BasicRespone>) => {
+export const refresh = async (req: AuthenticatedRequest, res: Response<TokenResponse | BasicRespone>) => {
   const authorization = req.get('Authorization');
   if (!authorization) {
     return res.status(400).json({

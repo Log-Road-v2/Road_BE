@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import redis from '../../config/redis';
 import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest, BasicRespone } from '../../types';
 
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (req: AuthenticatedRequest, res: Response<BasicRespone>) => {
   try {
     const authorization = req.get('Authorization');
     if (!authorization) {
