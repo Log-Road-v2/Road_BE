@@ -1,35 +1,20 @@
 import { Response } from 'express';
 import redis from '../../config/redis';
-import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest, BasicRespone } from '../../types';
+import { AuthenticatedRequest, BasicRespone, REDIS_KEY } from '../../types';
 
 export const logout = async (req: AuthenticatedRequest, res: Response<BasicRespone>) => {
   try {
-    const authorization = req.get('Authorization');
-    if (!authorization) {
+    const payload = req.payload;
+    if (!payload || payload.type !== 'access') {
       return res.status(400).json({
-        message: '확인할 수 없는 토큰'
-      });
-    }
-    const token = authorization.split(' ')[1];
-    const privateKey = process.env.PRIVATE_KEY;
-    if (!privateKey) {
-      return res.status(400).json({
-        message: 'private key is not defined'
+        message: '토큰 검증 실패'
       });
     }
 
-    const decoded = jwt.verify(token, privateKey) as { id: string };
-    const userId = decoded.id;
-    const keys = await redis.keys('refresh *');
-    for (const key of keys) {
-      const storedUserId = await redis.get(key);
-      if (storedUserId === userId) {
-        await redis.del(key);
-        break;
-      }
-    }
-    await redis.del(userId);
+    const userId = payload.id;
+
+    await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`);
+    await redis.del(`${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
 
     return res.status(200).json({
       message: '로그아웃 완료'

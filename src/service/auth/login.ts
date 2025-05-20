@@ -3,16 +3,20 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
-import { generateToken } from './token';
 import { LoginRequest, LoginResponse } from '../../types/auth';
-import { BasicRespone } from '../../types';
+import { BasicRespone, REDIS_KEY } from '../../types';
+import { generateToken } from '../../utils/jwt';
+import crypto from 'crypto';
 
 export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | BasicRespone>) => {
+  const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
+  const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
+
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
-      message: '올바르지 않은 입력값'
+      message: '올바르지 않은 입력 값'
     });
   }
   if (!checkEmailRegex(email)) {
@@ -34,11 +38,11 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<Lo
       });
     }
 
-    const accessToken = await generateToken(thisUser.id.toString(), true);
-    const refreshToken = await generateToken(Date.now().toString(), false);
+    const accessToken = generateToken(thisUser.id.toString(), crypto.randomUUID(), true);
+    const refreshToken = generateToken(crypto.randomUUID(), thisUser.id.toString(), false);
 
-    await redis.set(thisUser.id.toString(), accessToken, 'EX', 7200);
-    await redis.set(`refresh ${refreshToken}`, thisUser.id.toString(), 'EX', 604800);
+    await redis.set(`${REDIS_KEY.ACCESS_TOKEN} ${thisUser.id}`, accessToken, 'EX', accessTokenExpirySecond);
+    await redis.set(`${REDIS_KEY.REFRESH_TOKEN} ${thisUser.id}`, refreshToken, 'EX', refreshTokenExpirySecond);
 
     return res.status(200).json({
       role: thisUser.role,
