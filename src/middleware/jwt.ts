@@ -1,9 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-
-interface AuthenticatedRequest extends Request {
-  payload?: string | JwtPayload;
-}
+import { NextFunction, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest, PayloadData } from '../types';
 
 export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   try {
@@ -22,7 +19,15 @@ export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFu
       return;
     }
     const token = authorization.split(' ')[1];
-    const decoded = jwt.verify(token, privateKey);
+
+    const decoded = jwt.verify(token, privateKey) as PayloadData;
+    if (!decoded.id || !decoded.sub || !decoded.type || !decoded.iat) {
+      res.status(401).json({
+        message: '유효하지 않은 토큰 페이로드'
+      });
+      return;
+    }
+
     req.payload = decoded;
 
     next();
