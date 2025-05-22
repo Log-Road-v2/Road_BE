@@ -27,8 +27,18 @@ export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFu
       });
       return;
     }
-
     req.payload = decoded;
+
+    if (decoded.type === 'access') {
+      const userId = Number(decoded.id);
+      if (isNaN(userId)) {
+        res.status(400).json({
+          message: '토큰 검증 실패'
+        });
+        return;
+      }
+      req.userId = userId;
+    }
 
     next();
   } catch (err) {
