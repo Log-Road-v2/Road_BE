@@ -15,7 +15,7 @@ export interface PayloadData {
 export interface AuthenticatedRequest<Params = Record<string, never>, Query = ParsedQs, Body = Record<string, never>>
   extends Request<Params, any, Body, Query> {
   payload?: PayloadData;
-  userId?: Number;
+  userId?: number;
 }
 
 export const REDIS_KEY = {
