@@ -4,14 +4,12 @@ import { AuthenticatedRequest, BasicResponse, REDIS_KEY } from '../../types';
 
 export const logout = async (req: AuthenticatedRequest, res: Response<BasicResponse>) => {
   try {
-    const payload = req.payload;
-    if (!payload || payload.type !== 'access') {
+    const userId = req.userId;
+    if (!userId) {
       return res.status(400).json({
         message: '토큰 검증 실패'
       });
     }
-
-    const userId = payload.id;
 
     await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`);
     await redis.del(`${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
