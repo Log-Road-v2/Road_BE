@@ -28,20 +28,17 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response)
     });
   }
   if (role === Role.STUDENT) {
-    const gradeNum = Number(grade);
-    const classNum = Number(classNumber);
-    const studentNum = Number(studentNumber);
-    if (gradeNum < 1 || gradeNum > 3) {
+    if (!grade || grade < 1 || grade > 3) {
       return res.status(400).json({
         message: '올바르지 않은 학년'
       });
     }
-    if (classNum < 1 || classNum > 4) {
+    if (!classNumber || classNumber < 1 || classNumber > 4) {
       return res.status(400).json({
         message: '올바르지 않은 반'
       });
     }
-    if (studentNum < 1 || studentNum > 20) {
+    if (!studentNumber || studentNumber < 1 || studentNumber > 20) {
       return res.status(400).json({
         message: '올바르지 않은 번호'
       });
