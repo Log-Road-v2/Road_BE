@@ -5,9 +5,9 @@ export interface SignUpRequest {
   email: string;
   password: string;
   name: string;
-  grade?: string;
-  classNumber?: string;
-  studentNumber?: string;
+  grade?: number;
+  classNumber?: number;
+  studentNumber?: number;
 }
 
 export interface TokenResponse {

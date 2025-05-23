@@ -30,14 +30,15 @@ export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFu
     req.payload = decoded;
 
     if (decoded.type === 'access') {
-      const userId = Number(decoded.id);
-      if (isNaN(userId)) {
+      try {
+        const userId = BigInt(decoded.id);
+        req.userId = userId;
+      } catch (err) {
         res.status(400).json({
-          message: '토큰 검증 실패'
+          message: '유효하지 않은 사용자 ID'
         });
         return;
       }
-      req.userId = userId;
     }
 
     next();

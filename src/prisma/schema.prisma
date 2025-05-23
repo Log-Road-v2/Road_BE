@@ -58,11 +58,11 @@ model User {
 model Student {
   id            BigInt       @id @default(autoincrement()) @db.BigInt
   userId        BigInt?      @unique @db.BigInt
-  generation    String       @db.Char(2)
+  generation    Int?
   name          String       @db.VarChar(6)
-  grade         String?      @db.Char(1)
-  classNumber   String?      @db.Char(1)
-  studentNumber String?      @db.Char(2)
+  grade         Int?
+  classNumber   Int?
+  studentNumber Int?
   state         StudentState @default(SCHOOL)
 
   user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
