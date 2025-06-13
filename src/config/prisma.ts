@@ -1,6 +1,6 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role, StudentState, ContestState, Author, ProjectState } from '@prisma/client';
 
 const prisma = new PrismaClient();
 console.log('Prisma has initted');
 
-export { prisma, Role };
+export { prisma, Role, StudentState, ContestState, Author, ProjectState };
