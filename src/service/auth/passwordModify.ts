@@ -26,6 +26,8 @@ export const passwordModify = async (req: Request<{}, {}, PasswordModifyRequest>
       data: { password: hashed }
     });
 
+    await redis.del(email);
+
     return res.status(200).json({
       message: '비밀번호 변경 성공'
     });
