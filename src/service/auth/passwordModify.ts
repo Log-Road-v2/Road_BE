@@ -3,8 +3,9 @@ import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { Request, Response } from 'express';
 import { PasswordModifyRequest } from '../../types/auth';
+import { BasicResponse } from '../../types';
 
-export const passwordModify = async (req: Request<{}, {}, PasswordModifyRequest>, res: Response) => {
+export const passwordModify = async (req: Request<{}, {}, PasswordModifyRequest>, res: Response<BasicResponse>) => {
   try {
     const { email, code, newPassword } = req.body;
     const mailCode = await redis.get(email);
