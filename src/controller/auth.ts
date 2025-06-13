@@ -4,7 +4,7 @@ import { apiLimit } from '../middleware/limit';
 import { verifyJWT } from '../middleware/jwt';
 import { AuthenticatedRequest } from '../types';
 
-const app = express();
+const app = express.Router();
 
 app.post('/signup', apiLimit, (req: Request, res: Response) => {
   auth.signUp(req, res);

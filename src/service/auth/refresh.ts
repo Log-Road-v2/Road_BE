@@ -11,14 +11,14 @@ export const refresh = async (req: AuthenticatedRequest, res: Response<TokenResp
   try {
     const payload = req.payload;
     if (!payload || payload.type !== 'refresh') {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '토큰 검증 실패'
       });
     }
 
     const authorization = req.get('Authorization');
     if (!authorization) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '확인할 수 없는 토큰'
       });
     }
@@ -26,14 +26,14 @@ export const refresh = async (req: AuthenticatedRequest, res: Response<TokenResp
 
     const userId = payload.sub;
     if (!userId) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '만료되었거나 사용할 수 없는 토큰'
       });
     }
 
     const refreshToken = await redis.get(`${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
     if (!refreshToken || refreshToken !== token) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '만료되었거나 일치하지 않는 토큰'
       });
     }
@@ -47,7 +47,7 @@ export const refresh = async (req: AuthenticatedRequest, res: Response<TokenResp
     });
   } catch (err) {
     return res.status(500).json({
-      message: '서버 에러 발생'
+      message: '서버 오류 발생'
     });
   }
 };
