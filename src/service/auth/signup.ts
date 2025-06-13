@@ -2,9 +2,16 @@ import { prisma, Role } from '../../config/prisma';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
-import { SignUpRequest } from '../../types/auth';
+import { SignResponse, SignUpRequest } from '../../types/auth';
+import { generateToken } from '../../utils/jwt';
+import { BasicResponse, REDIS_KEY } from '../../types';
+import crypto from 'crypto';
+import redis from '../../config/redis';
 
-export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response) => {
+const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
+const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
+
+export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<SignResponse | BasicResponse>) => {
   const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
 
   if (!role || !email || !password || !name) {
@@ -69,8 +76,8 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response)
 
     const hash = await bcrypt.hash(password, 10);
 
-    await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
+    const user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
         data: {
           email: email,
           password: hash,
@@ -82,13 +89,29 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response)
       if (role === Role.STUDENT) {
         await tx.student.update({
           where: { id: existStudent?.id },
-          data: { userId: user.id }
+          data: { userId: createdUser.id }
         });
       }
+
+      return createdUser;
     });
 
+    if (!user) {
+      return res.status(500).json({
+        message: '회원 생성 실패'
+      });
+    }
+
+    const accessToken = generateToken(user.id.toString(), crypto.randomUUID(), true);
+    const refreshToken = generateToken(crypto.randomUUID(), user.id.toString(), false);
+
+    await redis.set(`${REDIS_KEY.ACCESS_TOKEN} ${user.id}`, accessToken, 'EX', accessTokenExpirySecond);
+    await redis.set(`${REDIS_KEY.REFRESH_TOKEN} ${user.id}`, refreshToken, 'EX', refreshTokenExpirySecond);
+
     return res.status(201).json({
-      message: '회원가입 성공'
+      role: user.role,
+      accessToken: accessToken,
+      refreshToken: refreshToken
     });
   } catch (err) {
     console.error(err);

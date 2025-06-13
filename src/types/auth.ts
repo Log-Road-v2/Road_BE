@@ -20,7 +20,7 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse extends TokenResponse {
+export interface SignResponse extends TokenResponse {
   role: Role;
 }
 
