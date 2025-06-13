@@ -3,15 +3,15 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
-import { LoginRequest, LoginResponse } from '../../types/auth';
+import { LoginRequest, SignResponse } from '../../types/auth';
 import { BasicResponse, REDIS_KEY } from '../../types';
 import { generateToken } from '../../utils/jwt';
 import crypto from 'crypto';
 
-export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | BasicResponse>) => {
-  const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
-  const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
+const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
+const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
+export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<SignResponse | BasicResponse>) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
