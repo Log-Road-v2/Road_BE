@@ -21,7 +21,11 @@ export const getOngoingContests = async (
       },
       orderBy: { id: 'asc' }
     })
-
+    
+    if (contests.length === 0) {
+      return res.status(200).json({ contests: [] });
+    }
+    
     const formattedContests: ContestData[] = contests.map((contest) => ({
       id: contest.id.toString(),
       name: contest.name,
