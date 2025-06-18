@@ -58,7 +58,7 @@ export const createProject = async (
 
     await prisma.$transaction(async (tx) => {
       const projectResult = await tx.project.upsert({
-        where: { id: projectId },
+        where: { id: projectId, user: { id: userId } },
         update: {
           ...data
         },

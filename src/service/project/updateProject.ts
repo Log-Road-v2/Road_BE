@@ -81,7 +81,7 @@ export const updateProject = async (
 
     await prisma.$transaction(async (tx) => {
       const updatedProject = await tx.project.update({
-        where: { id: projectId },
+        where: { id: projectId, user: { id: userId } },
         data
       });
 
