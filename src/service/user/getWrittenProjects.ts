@@ -22,7 +22,9 @@ export const getWrittenProjects = async (
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
 
-    const rawState = req.query.state?.trim().toUpperCase() || 'ALL';
+    const rawState = req.query.state
+      ? req.query.state?.trim().toUpperCase()
+      : 'ALL';
 
     if (!isValidProjectState(rawState)) {
       return res.status(400).json({
