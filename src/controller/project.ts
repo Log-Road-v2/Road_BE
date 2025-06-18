@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from '../types';
 
 const router = express.Router();
 
-router.get('/search', apiLimit, (req: AuthenticatedRequest, res: Response) => {
+router.get('/search', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
   project.searchProject(req, res)
 });
 
@@ -14,11 +14,11 @@ router.post('/', apiLimit, verifyJWT, (req: Request, res: Response) => {
   project.createProject(req, res);
 });
 
-router.get('/detail/:projectId', apiLimit, (req: AuthenticatedRequest, res: Response) => {
+router.get('/detail/:projectId', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
   project.getProjectDetail(req, res);
 });
 
-router.get('/student', apiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
+router.get('/student', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
     project.searchStudent(req, res);
   }
 );
@@ -33,7 +33,7 @@ router.post('/storage', apiLimit, verifyJWT, (req: Request, res: Response) => {
 });
 
 
-router.get('/storage/:projectId', apiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
+router.get('/storage/:projectId', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
   project.loadTempSavedProject(req, res)
 });
 
