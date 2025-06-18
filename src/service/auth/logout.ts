@@ -1,8 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import redis from '../../config/redis';
 import { BasicResponse, REDIS_KEY } from '../../types';
 
-export const logout = async (req: Request, res: Response<BasicResponse>) => {
+export const logoutHandler: RequestHandler = async (req, res) => {
+  logout(req, res);
+};
+
+const logout = async (req: Request, res: Response<BasicResponse>) => {
   try {
     const userId = req.userId;
     if (!userId) {

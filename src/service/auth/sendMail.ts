@@ -1,13 +1,20 @@
 import redis from '../../config/redis';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { createTransport } from 'nodemailer';
 import { SendMailRequest } from '../../types/auth';
 import { BasicResponse } from '../../types';
 
-export const sendMail = async (req: Request<{}, {}, SendMailRequest>, res: Response<BasicResponse>) => {
-  const emailId = process.env.EMAIL_ID;
-  const emailPw = process.env.EMAIL_PW;
+const EMAIL_ID = process.env.EMAIL_ID;
+const EMAIL_PW = process.env.EMAIL_PW;
+if (!EMAIL_ID || !EMAIL_PW) {
+  throw Error('email id or email pw get failed from env');
+}
 
+export const sendMailHandler: RequestHandler<unknown, BasicResponse, SendMailRequest> = async (req, res) => {
+  sendMail(req, res);
+};
+
+const sendMail = async (req: Request<unknown, BasicResponse, SendMailRequest>, res: Response<BasicResponse>) => {
   const { email } = req.body;
 
   const transport = createTransport({
@@ -16,8 +23,8 @@ export const sendMail = async (req: Request<{}, {}, SendMailRequest>, res: Respo
     port: 465,
     secure: true,
     auth: {
-      user: emailId,
-      pass: emailPw
+      user: EMAIL_ID,
+      pass: EMAIL_PW
     }
   });
 
@@ -25,7 +32,7 @@ export const sendMail = async (req: Request<{}, {}, SendMailRequest>, res: Respo
     const random = Math.random().toString(36).slice(2, 10);
 
     await transport.sendMail({
-      from: emailId,
+      from: EMAIL_ID,
       to: email,
       subject: 'Road 임시 비밀번호',
       text: `임시 비밀번호는 ${random}`

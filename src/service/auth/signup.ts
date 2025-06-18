@@ -1,5 +1,5 @@
 import { prisma, Role } from '../../config/prisma';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
 import { SignResponse, SignUpRequest } from '../../types/auth';
@@ -11,7 +11,14 @@ import redis from '../../config/redis';
 const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
 const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
-export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<SignResponse | BasicResponse>) => {
+export const signUpHandler: RequestHandler<unknown, SignResponse | BasicResponse, SignUpRequest> = async (req, res) => {
+  signUp(req, res);
+};
+
+const signUp = async (
+  req: Request<unknown, SignResponse | BasicResponse, SignUpRequest>,
+  res: Response<SignResponse | BasicResponse>
+) => {
   const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
 
   if (!role || !email || !password || !name) {

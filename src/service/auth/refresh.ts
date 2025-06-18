@@ -1,11 +1,15 @@
 import redis from '../../config/redis';
 import { BasicResponse, REDIS_KEY } from '../../types';
 import { TokenResponse } from '../../types/auth';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { generateToken } from '../../utils/jwt';
 import crypto from 'crypto';
 
-export const refresh = async (req: Request, res: Response<TokenResponse | BasicResponse>) => {
+export const refreshHandler: RequestHandler = async (req, res) => {
+  refresh(req, res);
+};
+
+const refresh = async (req: Request, res: Response<TokenResponse | BasicResponse>) => {
   const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
 
   try {
