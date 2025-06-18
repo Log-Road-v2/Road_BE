@@ -29,11 +29,9 @@ export const getOngoingContests = async (
       endDate: formatDate(contest.endDate)
     }));
 
-    const response: getContestResponse = {
+    return res.status(200).json({
       contests: formattedContests
-    }
-
-    return res.status(200).json(response);
+    });
 
   } catch (err) {
     console.log(err);
