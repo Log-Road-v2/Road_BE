@@ -22,9 +22,9 @@ export const searchStudent = async (
         { name: { contains: keyword } },
         ...(isKeywordNum
           ? [
-              { grade: keywordNum },
-              { classNumber: keywordNum },
-              { studentNumber: keywordNum },
+            { grade: { equals: keywordNum } },
+            { classNumber: { equals: keywordNum } },
+            { studentNumber: { equals: keywordNum } },
             ]
           : []),
       ],
@@ -45,6 +45,7 @@ export const searchStudent = async (
         { studentNumber: "asc" },
         { name: "asc" },
       ],
+      take: 15
     });
 
     const result: StudentDetail[] = students.map((student) => ({
