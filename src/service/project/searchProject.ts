@@ -15,9 +15,10 @@ export const searchProject = async (
   try {
     const userId = req.userId ?? undefined;
     const keywordRaw = req.query.keyword;
-    const keyword = typeof keywordRaw === 'string' ? keywordRaw.trim() : '';   
-    const offset = Number(req.query.offset) || 1;
-    const pageIndex = Math.max((isNaN(offset) ? 1 : offset) - 1, 0);
+    const keyword = typeof keywordRaw === 'string' ? keywordRaw.trim() : '';
+    const rawOffset = Number(req.query.offset);
+    const offset = Number.isInteger(rawOffset) && rawOffset > 0 ? rawOffset : 1;
+    const pageIndex = offset - 1;
     const skipAmount = PAGE_SIZE * pageIndex;
 
     const whereCondition: Prisma.ProjectWhereInput = keyword
