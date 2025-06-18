@@ -12,11 +12,17 @@ export const checkPasswordRegex = (password: string): boolean => {
 
 export const formatDate = (date: Date) => date.toISOString().split("T")[0];
 
-export const formatMembers = (rawMembers: any[]): StudentResponse[] => {
-  return rawMembers
-    .filter((m) => m.studentId !== null)
+export const formatMembers = <
+  T extends { studentId: unknown; student?: { name?: string } | null }
+>(
+  rawMembers: readonly T[],
+): StudentResponse[] =>
+  rawMembers
+    .filter(
+      (m): m is T & { studentId: string | number | bigint } =>
+        m.studentId != null
+    )
     .map((m) => ({
-      studentId: m.studentId!,
+      studentId: BigInt(m.studentId),
       name: m.student?.name,
     }));
-};
