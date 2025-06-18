@@ -10,7 +10,7 @@ export const getJoinedProjects = async (
   try {
     const userId = req.userId
     if (!userId) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '토큰 검증 실패'
       })
     }
