@@ -38,7 +38,7 @@ export const tempSaveProject = async (
       projectName,
       authorCategory,
       teamName,
-      skills: skills.length > 0 ? skills.join(",") : null,
+      skills: Array.isArray(skills) && skills.length ? skills.join(",") : null,
       introduction,
       description,
       startDate: new Date(startDate),
