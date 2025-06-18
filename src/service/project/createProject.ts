@@ -28,7 +28,7 @@ export const createProject = async (
     const contestId = BigInt(req.body.contestId)
     const filteredSkills = validationResult.filteredSkills || [];
     const filteredMembers = validationResult.filteredMembers || [];
-    const {projectName, authorCategory, teamName, introduction, description, startDate, endDate, image, video} = req.body
+    const { projectName, authorCategory, teamName, introduction, description, startDate, endDate, image, video } = req.body
 
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
