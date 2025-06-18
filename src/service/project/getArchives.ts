@@ -21,7 +21,7 @@ export const getArchives = async (
     const skipAmount = PAGE_SIZE * pageIndex;
 
     const contest = await prisma.contest.findUnique({
-      where: {id: BigInt(contestId)},
+      where: { id: BigInt(contestId) },
       select: {
         id: true,
         name: true,
@@ -51,17 +51,13 @@ export const getArchives = async (
             take: 1,
           }}),
         },
-        where: { 
-          contestId: contestId
-        },
+        where: { contestId },
         skip: skipAmount,
         take: PAGE_SIZE,
         orderBy: {projectName: 'asc'}
       }),
       prisma.project.count({
-        where: { 
-          contestId: contestId
-         }
+        where: { contestId }
       })
     ])
 
