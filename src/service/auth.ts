@@ -1,15 +1,15 @@
-import { signUp } from './auth/signup';
-import { refresh } from './auth/refresh';
-import { login } from './auth/login';
-import { sendMail } from './auth/sendMail';
-import { passwordModify } from './auth/passwordModify';
-import { logout } from './auth/logout';
+import { signUpHandler } from './auth/signup';
+import { refreshHandler } from './auth/refresh';
+import { loginHandler } from './auth/login';
+import { sendMailHandler } from './auth/sendMail';
+import { passwordModifyHandler } from './auth/passwordModify';
+import { logoutHandler } from './auth/logout';
 
 export default {
-  signUp,
-  refresh,
-  login,
-  sendMail,
-  passwordModify,
-  logout
+  signUpHandler,
+  refreshHandler,
+  loginHandler,
+  sendMailHandler,
+  passwordModifyHandler,
+  logoutHandler
 };
