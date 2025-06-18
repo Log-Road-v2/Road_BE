@@ -1,4 +1,4 @@
-import { prisma, Role } from '../../config/prisma';
+import { prisma } from '../../config/prisma';
 import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
@@ -19,16 +19,13 @@ const signUp = async (
   req: Request<unknown, SignResponse | BasicResponse, SignUpRequest>,
   res: Response<SignResponse | BasicResponse>
 ) => {
-  const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
+  const { email, code, password, grade, classNumber, studentNumber, name } = req.body;
 
-  if (!role || !email || !password || !name) {
+  const isStudent = grade && classNumber && studentNumber;
+
+  if (!email || !code || !password || !name) {
     return res.status(400).json({
       message: '올바르지 않은 입력값'
-    });
-  }
-  if (role === Role.ADMIN) {
-    return res.status(400).json({
-      message: '올바르지 않은 역할'
     });
   }
   if (!checkEmailRegex(email)) {
@@ -41,7 +38,7 @@ const signUp = async (
       message: '올바르지 않은 비밀번호'
     });
   }
-  if (role === Role.STUDENT) {
+  if (isStudent) {
     if (!grade || grade < 1 || grade > 3) {
       return res.status(400).json({
         message: '올바르지 않은 학년'
@@ -60,6 +57,12 @@ const signUp = async (
   }
 
   try {
+    const mailCode = await redis.get(email);
+    if (mailCode !== code) {
+      return res.status(409).json({
+        message: '인증코드 불일치'
+      });
+    }
     const existMail = await prisma.user.findUnique({ where: { email: email } });
     if (existMail) {
       return res.status(409).json({
@@ -67,7 +70,7 @@ const signUp = async (
       });
     }
     let existStudent = null;
-    if (role === Role.STUDENT) {
+    if (isStudent) {
       existStudent = await prisma.student.findFirst({ where: { grade, classNumber, studentNumber } });
       if (!existStudent) {
         return res.status(400).json({
@@ -88,12 +91,11 @@ const signUp = async (
         data: {
           email: email,
           password: hash,
-          name: name,
-          role: role
+          name: name
         }
       });
 
-      if (role === Role.STUDENT) {
+      if (isStudent) {
         await tx.student.update({
           where: { id: existStudent?.id },
           data: { userId: createdUser.id }

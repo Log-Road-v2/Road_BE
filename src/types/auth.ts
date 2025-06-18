@@ -1,8 +1,8 @@
 import { Role } from '../config/prisma';
 
 export interface SignUpRequest {
-  role: Role;
   email: string;
+  code: string;
   password: string;
   name: string;
   grade?: number;
