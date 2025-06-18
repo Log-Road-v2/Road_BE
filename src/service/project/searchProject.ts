@@ -38,11 +38,11 @@ export const searchProject = async (
           authorCategory: true,
           introduction: true,
           image: true,
-          ...(userId && {mark: {
-            where: { userId },
-            select: { id: true },
-            take: 1,
-          }}),
+          ...(userId && {
+            _count: {
+              select: { mark: { where: { userId } } }
+            }
+          })
         },
         where: whereCondition,
         skip: skipAmount,
@@ -61,7 +61,7 @@ export const searchProject = async (
       authorCategory: project.authorCategory,
       introduction: project.introduction,
       image: project.image,
-      isMark: userId ? (project.mark && project.mark.length > 0 ? true : false) : null
+      isMark: userId ? Boolean(project._count.mark) : null
     }))
 
     return res.status(200).json({
