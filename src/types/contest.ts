@@ -5,6 +5,6 @@ export interface getContestResponse {
 export interface ContestData {
   id: string, 
   name: string,
-  startDate: Date | string,
-  endDate: Date | string
+  startDate: string,
+  endDate: string
 }
