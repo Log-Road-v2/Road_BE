@@ -5,7 +5,7 @@ export {};
 declare global {
   namespace Express {
     export interface Request {
-      decoded?: PayloadData;
+      payload?: PayloadData;
       userId?: bigint;
     }
   }
