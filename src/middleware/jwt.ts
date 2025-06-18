@@ -1,13 +1,13 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest, PayloadData } from '../types';
+import { PayloadData } from '../types';
 
 const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
   throw Error('secret key get fail from env');
 }
 
-export const verifyJWT = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+export const verifyJWT = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const authorization = req.get('Authorization');
     if (!authorization || !authorization.startsWith('Bearer ')) {

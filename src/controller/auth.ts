@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import auth from '../service/auth';
 import { apiLimit } from '../middleware/limit';
 import { verifyJWT } from '../middleware/jwt';
-import { AuthenticatedRequest } from '../types';
 
 const app = express.Router();
 
@@ -12,7 +11,7 @@ app.post('/signup', apiLimit, (req: Request, res: Response) => {
 app.post('/login', apiLimit, (req: Request, res: Response) => {
   auth.login(req, res);
 });
-app.post('/refresh', apiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
+app.post('/refresh', apiLimit, verifyJWT, (req: Request, res: Response) => {
   auth.refresh(req, res);
 });
 app.post('/email', apiLimit, (req: Request, res: Response) => {
@@ -21,7 +20,7 @@ app.post('/email', apiLimit, (req: Request, res: Response) => {
 app.patch('/password', apiLimit, (req: Request, res: Response) => {
   auth.passwordModify(req, res);
 });
-app.post('/logout', apiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
+app.post('/logout', apiLimit, verifyJWT, (req: Request, res: Response) => {
   auth.logout(req, res);
 });
 
