@@ -15,7 +15,7 @@ export const getArchives = async (
   try {
     const userId = req.userId ?? undefined
 
-    const contestId = BigInt(req.params.contestId)
+    const contestId = req.params.contestId
     const offset = Number(req.query.offset) || 1;
     const pageIndex = Math.max((isNaN(offset) ? 1 : offset) - 1, 0);
     const skipAmount = PAGE_SIZE * pageIndex;
