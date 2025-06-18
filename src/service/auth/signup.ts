@@ -11,7 +11,10 @@ import redis from '../../config/redis';
 const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
 const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
-export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<SignResponse | BasicResponse>) => {
+export const signUp = async (
+  req: Request<{}, SignUpRequest | BasicResponse, SignUpRequest>,
+  res: Response<SignResponse | BasicResponse>
+) => {
   const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
 
   if (!role || !email || !password || !name) {
@@ -76,7 +79,7 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<
 
     const hash = await bcrypt.hash(password, 10);
 
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx: any) => {
       const createdUser = await tx.user.create({
         data: {
           email: email,
