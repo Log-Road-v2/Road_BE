@@ -15,7 +15,7 @@ export const getBookmarkedProjects = async (
       return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
     }
 
-    const rawOffset = req.params.offset;
+    const rawOffset = req.query.offset;
     const offsetNumber = Math.max(Number(rawOffset ?? 1), 1);
     const skip = PAGE_SIZE * (offsetNumber - 1);
 
