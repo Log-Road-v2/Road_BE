@@ -12,16 +12,13 @@ export const loadTempSavedProject = async (
 ) => {
   try {
     const userId = req.userId;
-    const { projectId } = req.params;
-
-    console.log(userId)
-    console.log(projectId)
-
     if (!userId) {
       return res.status(400).json({ 
         message: "토큰 검증 실패"
       });
     }
+
+    const { projectId } = req.params;
 
     if (!projectId) {
       return res.status(400).json({
@@ -31,8 +28,8 @@ export const loadTempSavedProject = async (
 
     const project = await prisma.project.findFirst({
       where: {
-        id: projectId,
-        writerId: userId,
+        id: BigInt(projectId),
+        writerId: BigInt(userId),
         state: "WRITING",
       },
       select: {
