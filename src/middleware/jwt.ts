@@ -42,7 +42,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction): void
     next();
   } catch (err) {
     console.error(err);
-    res.status(500).json({
+    res.status(400).json({
       message: '토큰 검증 오류 발생'
     });
   }
