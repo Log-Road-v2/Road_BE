@@ -47,7 +47,7 @@ model User {
   email      String  @unique @db.VarChar(32)
   password   String
   name       String  @db.VarChar(6)
-  role       Role
+  role       Role    @default(STUDENT)
 
   student    Student?
   project    Project[]
