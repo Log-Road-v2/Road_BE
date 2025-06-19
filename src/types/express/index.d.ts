@@ -1,4 +1,5 @@
 import express from 'express';
+import { PayloadData } from '..';
 
 export {};
 
@@ -9,11 +10,4 @@ declare global {
       userId?: bigint;
     }
   }
-}
-
-interface PayloadData {
-  id: string;
-  sub: string;
-  type: 'access' | 'refresh';
-  iat: number;
 }
