@@ -1,8 +1,12 @@
-import { Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import redis from '../../config/redis';
-import { AuthenticatedRequest, BasicResponse, REDIS_KEY } from '../../types';
+import { BasicResponse, REDIS_KEY } from '../../types';
 
-export const logout = async (req: AuthenticatedRequest, res: Response<BasicResponse>) => {
+export const logoutHandler: RequestHandler = async (req, res) => {
+  await logout(req, res);
+};
+
+const logout = async (req: Request, res: Response<BasicResponse>) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -11,8 +15,7 @@ export const logout = async (req: AuthenticatedRequest, res: Response<BasicRespo
       });
     }
 
-    await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`);
-    await redis.del(`${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
+    await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`, `${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
 
     return res.status(200).json({
       message: '로그아웃 완료'

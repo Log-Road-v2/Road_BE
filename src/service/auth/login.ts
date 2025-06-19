@@ -1,5 +1,5 @@
 import { prisma } from '../../config/prisma';
-import { Request, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import redis from '../../config/redis';
 import { checkEmailRegex } from '../../utils/regex';
@@ -11,7 +11,14 @@ import crypto from 'crypto';
 const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
 const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
-export const login = async (req: Request<{}, {}, LoginRequest>, res: Response<SignResponse | BasicResponse>) => {
+export const loginHandler: RequestHandler<unknown, SignResponse | BasicResponse, LoginRequest> = async (req, res) => {
+  await login(req, res);
+};
+
+const login = async (
+  req: Request<unknown, SignResponse | BasicResponse, LoginRequest>,
+  res: Response<SignResponse | BasicResponse>
+) => {
   const { email, password } = req.body;
 
   if (!email || !password) {

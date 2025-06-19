@@ -1,5 +1,5 @@
-import { prisma, Role } from '../../config/prisma';
-import { Request, Response } from 'express';
+import { prisma } from '../../config/prisma';
+import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
 import { SignResponse, SignUpRequest } from '../../types/auth';
@@ -11,17 +11,21 @@ import redis from '../../config/redis';
 const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) || 7200;
 const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
-export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<SignResponse | BasicResponse>) => {
-  const { role, email, password, grade, classNumber, studentNumber, name } = req.body;
+export const signUpHandler: RequestHandler<unknown, SignResponse | BasicResponse, SignUpRequest> = async (req, res) => {
+  await signUp(req, res);
+};
 
-  if (!role || !email || !password || !name) {
+const signUp = async (
+  req: Request<unknown, SignResponse | BasicResponse, SignUpRequest>,
+  res: Response<SignResponse | BasicResponse>
+) => {
+  const { email, code, password, grade, classNumber, studentNumber, name } = req.body;
+
+  const isStudent = grade && classNumber && studentNumber;
+
+  if (!email || !code || !password || !name) {
     return res.status(400).json({
       message: '올바르지 않은 입력값'
-    });
-  }
-  if (role === Role.ADMIN) {
-    return res.status(400).json({
-      message: '올바르지 않은 역할'
     });
   }
   if (!checkEmailRegex(email)) {
@@ -34,7 +38,7 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<
       message: '올바르지 않은 비밀번호'
     });
   }
-  if (role === Role.STUDENT) {
+  if (isStudent) {
     if (!grade || grade < 1 || grade > 3) {
       return res.status(400).json({
         message: '올바르지 않은 학년'
@@ -53,6 +57,12 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<
   }
 
   try {
+    const mailCode = await redis.get(email);
+    if (!mailCode || mailCode !== code) {
+      return res.status(409).json({
+        message: '만료된 코드거나 인증 코드가 일치하지 않음'
+      });
+    }
     const existMail = await prisma.user.findUnique({ where: { email: email } });
     if (existMail) {
       return res.status(409).json({
@@ -60,7 +70,7 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<
       });
     }
     let existStudent = null;
-    if (role === Role.STUDENT) {
+    if (isStudent) {
       existStudent = await prisma.student.findFirst({ where: { grade, classNumber, studentNumber } });
       if (!existStudent) {
         return res.status(400).json({
@@ -81,12 +91,11 @@ export const signUp = async (req: Request<{}, {}, SignUpRequest>, res: Response<
         data: {
           email: email,
           password: hash,
-          name: name,
-          role: role
+          name: name
         }
       });
 
-      if (role === Role.STUDENT) {
+      if (isStudent) {
         await tx.student.update({
           where: { id: existStudent?.id },
           data: { userId: createdUser.id }
