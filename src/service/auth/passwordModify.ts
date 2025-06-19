@@ -9,7 +9,7 @@ export const passwordModifyHandler: RequestHandler<unknown, BasicResponse, Passw
   req,
   res
 ) => {
-  passwordModify(req, res);
+  await passwordModify(req, res);
 };
 
 const passwordModify = async (

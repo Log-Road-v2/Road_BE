@@ -11,7 +11,7 @@ if (!EMAIL_ID || !EMAIL_PW) {
 }
 
 export const sendMailHandler: RequestHandler<unknown, BasicResponse, SendMailRequest> = async (req, res) => {
-  sendMail(req, res);
+  await sendMail(req, res);
 };
 
 const sendMail = async (req: Request<unknown, BasicResponse, SendMailRequest>, res: Response<BasicResponse>) => {

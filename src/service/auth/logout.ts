@@ -3,7 +3,7 @@ import redis from '../../config/redis';
 import { BasicResponse, REDIS_KEY } from '../../types';
 
 export const logoutHandler: RequestHandler = async (req, res) => {
-  logout(req, res);
+  await logout(req, res);
 };
 
 const logout = async (req: Request, res: Response<BasicResponse>) => {
