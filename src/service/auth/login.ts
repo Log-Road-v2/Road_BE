@@ -12,7 +12,7 @@ const accessTokenExpirySecond = Number(process.env.ACCESS_TOKEN_EXPIRY_SECOND) |
 const refreshTokenExpirySecond = Number(process.env.REFRESH_TOKEN_EXPIRY_SECOND) || 604800;
 
 export const loginHandler: RequestHandler<unknown, SignResponse | BasicResponse, LoginRequest> = async (req, res) => {
-  login(req, res);
+  await login(req, res);
 };
 
 const login = async (

@@ -6,7 +6,7 @@ import { generateToken } from '../../utils/jwt';
 import crypto from 'crypto';
 
 export const refreshHandler: RequestHandler = async (req, res) => {
-  refresh(req, res);
+  await refresh(req, res);
 };
 
 const refresh = async (req: Request, res: Response<TokenResponse | BasicResponse>) => {
