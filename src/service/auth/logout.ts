@@ -15,8 +15,7 @@ const logout = async (req: Request, res: Response<BasicResponse>) => {
       });
     }
 
-    await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`);
-    await redis.del(`${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
+    await redis.del(`${REDIS_KEY.ACCESS_TOKEN} ${userId}`, `${REDIS_KEY.REFRESH_TOKEN} ${userId}`);
 
     return res.status(200).json({
       message: '로그아웃 완료'
