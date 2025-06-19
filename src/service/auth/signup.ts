@@ -58,9 +58,9 @@ const signUp = async (
 
   try {
     const mailCode = await redis.get(email);
-    if (mailCode !== code) {
+    if (!mailCode || mailCode !== code) {
       return res.status(409).json({
-        message: '인증코드 불일치'
+        message: '만료된 코드거나 인증 코드가 일치하지 않음'
       });
     }
     const existMail = await prisma.user.findUnique({ where: { email: email } });
