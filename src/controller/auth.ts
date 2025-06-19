@@ -10,6 +10,6 @@ app.post('/login', apiLimit, auth.loginHandler);
 app.post('/refresh', apiLimit, verifyJWT, auth.refreshHandler);
 app.post('/email', apiLimit, auth.sendMailHandler);
 app.patch('/password', apiLimit, auth.passwordModifyHandler);
-app.post('/logout', apiLimit, verifyJWT, auth.loginHandler);
+app.post('/logout', apiLimit, verifyJWT, auth.logoutHandler);
 
 export default app;
