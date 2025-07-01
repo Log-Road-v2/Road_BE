@@ -19,13 +19,16 @@ const signUp = async (
   req: Request<unknown, SignResponse | BasicResponse, SignUpRequest>,
   res: Response<SignResponse | BasicResponse>
 ) => {
-  const { email, code, password, grade, classNumber, studentNumber, name } = req.body;
-
-  const isStudent = grade && classNumber && studentNumber;
+  const { role, email, code, password, grade, classNumber, studentNumber, name } = req.body;
 
   if (!email || !code || !password || !name) {
     return res.status(400).json({
       message: '올바르지 않은 입력값'
+    });
+  }
+  if (!(role === 'STUDENT' || role === 'TEACHER')) {
+    return res.status(400).json({
+      message: '회원가입할 수 없는 역할입니다'
     });
   }
   if (!checkEmailRegex(email)) {
@@ -38,7 +41,7 @@ const signUp = async (
       message: '올바르지 않은 비밀번호'
     });
   }
-  if (isStudent) {
+  if (role === 'STUDENT') {
     if (!grade || grade < 1 || grade > 3) {
       return res.status(400).json({
         message: '올바르지 않은 학년'
@@ -70,7 +73,7 @@ const signUp = async (
       });
     }
     let existStudent = null;
-    if (isStudent) {
+    if (role === 'STUDENT') {
       existStudent = await prisma.student.findFirst({ where: { grade, classNumber, studentNumber } });
       if (!existStudent) {
         return res.status(400).json({
@@ -91,11 +94,12 @@ const signUp = async (
         data: {
           email: email,
           password: hash,
-          name: name
+          name: name,
+          role: role
         }
       });
 
-      if (isStudent) {
+      if (role === 'STUDENT') {
         await tx.student.update({
           where: { id: existStudent?.id },
           data: { userId: createdUser.id }
