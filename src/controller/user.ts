@@ -1,25 +1,13 @@
-import express, { Response } from 'express';
+import express from 'express';
 import user from '../service/user';
 import { getApiLimit } from '../middleware/limit';
 import { verifyJWT } from '../middleware/jwt';
-import { AuthenticatedRequest } from '../types';
 
-const router = express();
+const app = express();
 
-router.get('/', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  user.getUserInfo(req, res)
-});
+app.get('/', verifyJWT, getApiLimit, user.getUserInfoHandler)
+app.get('/projects', verifyJWT, getApiLimit, user.getJoinedProjectsHandler)
+app.get('/submissions', verifyJWT, getApiLimit, user.getWrittenProjectsHandler)
+app.get('/mark', verifyJWT, getApiLimit, user.getBookmarkedProjectsHandler)
 
-router.get('/projects', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  user.getJoinedProjects(req, res)
-});
-
-router.get('/submissions', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  user.getWrittenProjects(req, res)
-});
-
-router.get('/mark', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  user.getBookmarkedProjects(req, res)
-});
-
-export default router
+export default app
