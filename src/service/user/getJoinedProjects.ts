@@ -1,18 +1,20 @@
 import { prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
+import { Response, Request, RequestHandler } from "express";
+import { BasicResponse } from "../../types";
 import { GetProjectResponse } from "../../types/user";
 
-export const getJoinedProjects = async (
-  req: AuthenticatedRequest,
+export const getJoinedProjectsHandler: RequestHandler <unknown, BasicResponse | GetProjectResponse> = (req, res) => {
+  getJoinedProjects(req, res)
+}
+
+const getJoinedProjects = async (
+  req: Request<unknown, BasicResponse | GetProjectResponse>,
   res: Response<BasicResponse | GetProjectResponse>
 ) => {
   try {
     const userId = req.userId
     if (!userId) {
-      return res.status(401).json({
-        message: '토큰 검증 실패'
-      })
+      return res.status(401).json({ message: '토큰 검증 실패' })
     }
 
     const projects = await prisma.project.findMany({
@@ -24,9 +26,13 @@ export const getJoinedProjects = async (
         image: true
       },
       where: {
-        OR: [
-          { writerId: userId },
-          { member: { some: { studentId: userId } } }
+        AND: [
+          {
+            OR: [
+              { writerId: userId },
+              { member: { some: { studentId: userId } } },
+            ],
+          },
         ]
       },
       orderBy: { projectName: 'asc' }

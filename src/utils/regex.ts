@@ -10,7 +10,7 @@ export const checkPasswordRegex = (password: string): boolean => {
   return passwordPattern.test(password);
 };
 
-export const formatDate = (date: Date) => date.toISOString().split("T")[0];
+export const formatDate = (date: Date | string) => date.toString().split("T")[0];
 
 export const formatMembers = <
   T extends { studentId: unknown; student?: { name?: string } | null }
@@ -23,6 +23,6 @@ export const formatMembers = <
         m.studentId != null
     )
     .map((m) => ({
-      studentId: BigInt(m.studentId),
+      studentId: m.studentId.toString(),
       name: m.student?.name,
     }));

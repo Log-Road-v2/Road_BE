@@ -1,16 +1,10 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 import contest from '../service/contest'
-import { getApiLimit } from '../middleware/limit'
-import { AuthenticatedRequest } from '../types';
+import { getApiLimit } from '../middleware/limit';
 
-const router = express.Router(); 
+const app = express.Router(); 
 
-router.get('/', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
-  contest.getContestList(req, res)
-})
+app.get('/', getApiLimit, contest.getContestList)
+app.get('/present', getApiLimit, contest.getOngoingContests)
 
-router.get('/present', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
-  contest.getOngoingContests(req, res)
-})
-
-export default router
+export default app

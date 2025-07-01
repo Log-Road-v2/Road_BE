@@ -1,37 +1,24 @@
 import { prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { RegisterProjectBody } from "../../types/project"
+import { ProjectState } from "@prisma/client";
+import { RequestHandler, Response, Request } from "express";
+import { BasicResponse } from "../../types";
+import { RegisterProjectBody, RequestUser, ProjectIdParam } from "../../types/project"
 import { validateProjectInput } from "../../utils/validation"
-import { ProjectState } from "../../config/prisma";
 
 // 프로젝트 글 수정
 
-export const updateProject = async (
-  req: AuthenticatedRequest<{}, {}, RegisterProjectBody>,
-  res: Response<BasicResponse>
+export const updateProjectHandler: RequestHandler <ProjectIdParam, RegisterProjectBody | BasicResponse | RequestUser> = (req, res) => {
+  updateProject(req, res)
+}
+
+const updateProject = async (
+  req: Request<ProjectIdParam, RegisterProjectBody | BasicResponse | RequestUser>,
+  res: Response<BasicResponse | RegisterProjectBody>
 ) => {
   try {
     const userId = req.userId;
-    if (!userId) {
-      return res.status(400).json({ 
-        message: '토큰 검증 실패'
-       })
-    }
-
-    const validationResult = validateProjectInput(req.body);
-    if (!validationResult.valid) {
-      return res.status(400).json({ message: validationResult.message || "" });
-    }
-
-
-    const projectId = BigInt((req.params as { projectId: string }).projectId || "0");
-    const contestId = BigInt(req.body.contestId)
-
-    if (!contestId) {
-      return res.status(400).json({ message: "잘못된 대회 ID입니다." });
-    }
-
+    const { projectId: rawProjectId } = req.params;
+    const { contestId: rawContestId } = req.body;
     const {
       projectName,
       authorCategory,
@@ -44,8 +31,22 @@ export const updateProject = async (
       video,
     } = req.body;
 
-    const { filteredSkills = [], filteredMembers = [] } = validationResult;
+    if (!userId) {
+      return res.status(401).json({ message: "토큰 검증 실패" });
+    }
 
+    const validationResult = validateProjectInput(req.body);
+    if (!validationResult.valid) {
+      return res.status(400).json({ message: validationResult.message || "" });
+    }
+
+    const projectId = BigInt(rawProjectId || "0");
+    const contestId = BigInt(rawContestId);
+
+    if (!contestId) {
+      return res.status(400).json({ message: "잘못된 대회 ID입니다." });
+    }
+    
     const [existingProject, contest] = await Promise.all([
       prisma.project.findUnique({ where: { id: projectId } }),
       prisma.contest.findUnique({ where: { id: contestId } }),
@@ -54,16 +55,16 @@ export const updateProject = async (
     if (!existingProject) {
       return res.status(404).json({ message: "수정할 프로젝트를 찾을 수 없습니다." });
     }
-
-    if (existingProject.writerId !== userId) {
+    if (existingProject.writerId !== userId && existingProject.state === ProjectState.WRITING) {
       return res.status(403).json({ message: "프로젝트를 수정할 권한이 없습니다." });
     }
-
     if (!contest) {
       return res.status(404).json({ message: "해당 대회를 찾을 수 없습니다." });
     }
 
-    const data = {
+    const { filteredSkills = [], filteredMembers = [] } = validationResult;
+
+    const updateData = {
       contestId,
       writerId: userId,
       projectName,
@@ -76,25 +77,25 @@ export const updateProject = async (
       endDate: new Date(endDate),
       image: image ?? null,
       video: video ?? null,
-      state: ProjectState.MODIFY
-    }
+      state: ProjectState.MODIFY,
+    };
 
     await prisma.$transaction(async (tx) => {
-      const updatedProject = await tx.project.update({
+      const updated = await tx.project.update({
         where: { id: projectId, user: { id: userId } },
-        data
+        data: updateData,
       });
 
-      await tx.member.deleteMany({ where: { projectId: updatedProject.id } });
+      await tx.member.deleteMany({ where: { projectId: updated.id } });
 
       if (filteredMembers.length > 0) {
         const memberData = filteredMembers.map((m) => ({
           studentId: m.studentId,
-          projectId: updatedProject.id,
+          projectId: updated.id,
         }));
         await tx.member.createMany({ data: memberData });
       }
-    })
+    });
 
     return res.status(200).json({
       message: "프로젝트가 성공적으로 수정되었습니다.",

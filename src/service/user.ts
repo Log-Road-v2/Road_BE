@@ -1,11 +1,11 @@
-import { getUserInfo } from "./user/getUserInfo";
-import { getJoinedProjects } from "./user/getJoinedProjects";
-import { getWrittenProjects } from "./user/getWrittenProjects";
-import { getBookmarkedProjects } from "./user/getBookmarkedProjects";
+import { getUserInfoHandler } from "./user/getUserInfo";
+import { getJoinedProjectsHandler } from "./user/getJoinedProjects";
+import { getWrittenProjectsHandler } from "./user/getWrittenProjects";
+import { getBookmarkedProjectsHandler } from "./user/getBookmarkedProjects";
 
 export default {
-  getUserInfo,
-  getJoinedProjects,
-  getWrittenProjects,
-  getBookmarkedProjects
+  getUserInfoHandler,
+  getJoinedProjectsHandler,
+  getWrittenProjectsHandler,
+  getBookmarkedProjectsHandler
 }

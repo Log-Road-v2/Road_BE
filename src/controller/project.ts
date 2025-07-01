@@ -1,48 +1,18 @@
-import express, { Request, Response } from 'express'
+import express from 'express'
 import project from '../service/project'
 import { apiLimit, getApiLimit } from '../middleware/limit'
 import { verifyJWT } from '../middleware/jwt';
-import { AuthenticatedRequest } from '../types';
 
-const router = express.Router();
+const app = express.Router();
 
-router.get('/search', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
-  project.searchProject(req, res)
-});
+app.get('/search', getApiLimit, project.searchProjectHandler)
+app.post('/', verifyJWT, apiLimit, project.createProjectHandler)
+app.get('/detail/:projectId', getApiLimit, project.getProjectDetailHandler)
+app.get('/student', verifyJWT, getApiLimit, project.searchStudentHandler)
+app.patch('/:projectId', verifyJWT, apiLimit, project.updateProjectHandler)
+app.post('/storage', verifyJWT, apiLimit, project.tempSaveProjectHandler)
+app.get('/storage/:projectId', verifyJWT, getApiLimit, project.loadTempSavedProjectHandler)
+app.post('/:projectId/mark', verifyJWT, apiLimit, project.toggleProjectBookmarkHandler)
+app.get('/:contestId', getApiLimit, project.archivesHandler)
 
-router.post('/', apiLimit, verifyJWT, (req: Request, res: Response) => {
-  project.createProject(req, res);
-});
-
-router.get('/detail/:projectId', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
-  project.getProjectDetail(req, res);
-});
-
-router.get('/student', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-    project.searchStudent(req, res);
-  }
-);
-
-router.patch('/:projectId', apiLimit, verifyJWT, (req: Request, res: Response) => {
-  project.updateProject(req, res);
-});
-
-
-router.post('/storage', apiLimit, verifyJWT, (req: Request, res: Response) => {
-  project.tempSaveProject(req, res);
-});
-
-
-router.get('/storage/:projectId', getApiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  project.loadTempSavedProject(req, res)
-});
-
-router.post('/:projectId/mark', apiLimit, verifyJWT, (req: AuthenticatedRequest, res: Response) => {
-  project.toggleProjectBookmark(req, res);
-});
-
-router.get('/:contestId', getApiLimit, (req: AuthenticatedRequest, res: Response) => {
-  project.getArchives(req, res);
-});
-
-export default router;
+export default app;

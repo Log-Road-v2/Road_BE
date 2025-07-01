@@ -33,6 +33,11 @@ export interface GetProjectResponse {
   projects: ProjectResponse[]
 }
 
+export interface OffsetQuery {
+  [key: string]: string | undefined
+  offset?: string
+}
+
 export type ProjectState = 
   | 'ALL'
   | 'PENDING'

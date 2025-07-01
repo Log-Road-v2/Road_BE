@@ -1,40 +1,47 @@
-import { Response } from 'express';
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { GetProjectResponse, ProjectState } from "../../types/user";
+import { Response, Request, RequestHandler } from 'express';
 import { prisma } from '../../config/prisma';
+import { BasicResponse } from "../../types";
+import { GetProjectResponse } from "../../types/user";
+import { ProjectState } from "@prisma/client";
 
-const VALID_PROJECT_STATES: Exclude<ProjectState, null>[] = [
-  'ALL', 'PENDING', 'APPROVAL', 'REJECTED', 'MODIFY', 'WRITING'
+type Query = { state?: ProjectState | 'ALL' };
+
+const VALID_STATES: (ProjectState | 'ALL')[] = [
+  'ALL', 'PENDING', 'APPROVAL', 'REJECTED', 'MODIFY', 'WRITING',
 ];
 
-const isValidProjectState = (state: string): state is ProjectState => {
-  return VALID_PROJECT_STATES.includes(state as ProjectState);
-};
+export const getWrittenProjectsHandler: RequestHandler <
+  unknown,
+  BasicResponse | GetProjectResponse,
+  unknown,
+  { state?: ProjectState | "ALL" }
+> = (req, res) => {
+  getWrittenProjects(req, res);
+}
 
 export const getWrittenProjects = async (
-  req: AuthenticatedRequest<{}, {}, {}, { state?: ProjectState }>,
+  req: Request<unknown, BasicResponse | GetProjectResponse, unknown, Query>,
   res: Response<BasicResponse | GetProjectResponse>
 ) => {
   try {
     const userId = req.userId;
-
     if (!userId) {
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
 
-    const rawState = req.query.state
-      ? req.query.state?.trim().toUpperCase()
-      : 'ALL';
+    const rawState = req.query.state?.trim().toUpperCase() || 'ALL';
 
-    if (!isValidProjectState(rawState)) {
-      return res.status(400).json({
-        message: '잘못된 프로젝트 상태입니다.'
-      });
+    if (!VALID_STATES.includes(rawState as ProjectState | 'ALL')) {
+      return res.status(400).json({ message: '잘못된 프로젝트 상태입니다.' });
     }
 
     const isAll = rawState === 'ALL';
 
-    const projectsFromDb = await prisma.project.findMany({
+    const projects = await prisma.project.findMany({
+      where: {
+        writerId: userId,
+        ...(isAll ? {} : { state: rawState as ProjectState }),
+      },
       select: {
         id: true,
         projectName: true,
@@ -42,20 +49,15 @@ export const getWrittenProjects = async (
         authorCategory: true,
         image: true,
       },
-      where: {
-        writerId: userId,
-        ...(isAll ? {} : { state: rawState }),
-      },
       orderBy: { projectName: 'asc' },
     });
 
-    const projects = projectsFromDb.map((project) => ({
+    const formattedProjects = projects.map(project => ({
       ...project,
       id: project.id.toString(),
     }));
 
-    return res.status(200).json({ projects });
-
+    return res.status(200).json({ projects: formattedProjects });
   } catch (err) {
     console.error('getWrittenProjects error:', err);
     return res.status(500).json({ message: '서버 오류 발생' });
