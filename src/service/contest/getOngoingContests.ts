@@ -1,18 +1,19 @@
 import { ContestState, prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { ContestData, getContestResponse } from "../../types/contest";
+import { Response, RequestHandler, Request } from "express";
+import { BasicResponse } from "../../types";
+import { ContestData, ContestResponse } from "../../types/contest";
 import { formatDate } from "../../utils/regex";
 
 // 현재 진행중인 대회 목록 조회
 
-export const getOngoingContests = async (
-  req: AuthenticatedRequest,
-  res: Response<BasicResponse | getContestResponse>
-) => {
+export const getOngoingContests: RequestHandler<unknown, ContestResponse | BasicResponse> = async (_req, res) => {
   try {
     const contests = await prisma.contest.findMany({
-      where: { state: ContestState.NOW },
+      where: {
+        state: {
+          in: [ContestState.NOW, ContestState.VOTING, ContestState.PENDING],
+        },
+      },
       select: {
         id: true,
         name: true,
@@ -22,24 +23,17 @@ export const getOngoingContests = async (
       orderBy: { id: 'asc' }
     })
     
-    if (contests.length === 0) {
-      return res.status(200).json({ contests: [] });
-    }
-    
-    const formattedContests: ContestData[] = contests.map((contest) => ({
-      id: contest.id.toString(),
-      name: contest.name,
-      startDate: formatDate(contest.startDate),
-      endDate: formatDate(contest.endDate)
+    const formattedContests: ContestData[] = contests.map(({ id, name, startDate, endDate }) => ({
+      id: id.toString(),
+      name,
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
     }));
 
-    return res.status(200).json({
-      contests: formattedContests
-    });
-
+    res.status(200).json({ contests: formattedContests });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
+    res.status(500).json({
       message: "서버 오류 발생",
     });
   }
