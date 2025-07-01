@@ -1,64 +1,49 @@
 import { prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
+import { BasicResponse } from "../../types";
+import { Request, RequestHandler, Response } from "express";
+import { ProjectIdParam, RequestUser } from "../../types/project";
 
 // 북마크
 
-export const toggleProjectBookmark = async (
-  req: AuthenticatedRequest,
+export const toggleProjectBookmarkHandler: RequestHandler<ProjectIdParam, unknown, RequestUser> = (req, res) => {
+  toggleProjectBookmark(req, res);
+}
+
+const toggleProjectBookmark = async (
+  req: Request<ProjectIdParam, unknown, RequestUser>,
   res: Response<BasicResponse>
 ) => {
   try {
-    const userId = req.userId;
-    const { projectId } = req.params;
+    const rawUserId = req.userId;
+    const rawProjectId = req.params.projectId;
 
-    if (!userId) {
-      return res.status(400).json({ 
-        message: '토큰 검증 실패'
-       })
+    if (!rawUserId) {
+      return res.status(400).json({ message: '토큰 검증 실패' })
     }
 
-    const project = await prisma.project.findUnique({
-      where: { id : BigInt(projectId) },
-    })
-
-    if(!project) {
-      return res.status(404).json({
-        message: "요청한 정보가 존재하지 않습니다"
-      })
+    if (!rawProjectId) {
+      return res.status(400).json({ message: "프로젝트 아이디가 유효하지 않습니다." });
     }
 
-    const exciting = await prisma.mark.findUnique({
-      where: {
-        projectId_userId: {
-          projectId: BigInt(projectId),
-          userId: BigInt(userId),
-        },
-      },
+    const projectId = BigInt(rawProjectId);
+    const userId = BigInt(rawUserId);
+
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      return res.status(404).json({ message: "요청한 정보가 존재하지 않습니다." });
+    }
+
+    const existingBookmark = await prisma.mark.findUnique({
+      where: { projectId_userId: { projectId, userId } },
     });
 
-    if(exciting) {
-      await prisma.mark.delete({
-        where: {
-          projectId_userId: {
-            projectId: BigInt(projectId),
-            userId: BigInt(userId),
-          },
-        },
-      });
-
+    if (existingBookmark) {
+      await prisma.mark.delete({ where: { projectId_userId: { projectId, userId } } });
       return res.status(200).json({ message: "북마크 해제 완료" });
     } else {
-      await prisma.mark.create({
-        data: {
-          projectId: BigInt(projectId),
-          userId: BigInt(userId),
-        },
-      });
-
+      await prisma.mark.create({ data: { projectId, userId } });
       return res.status(201).json({ message: "북마크 추가 완료" });
     }
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({

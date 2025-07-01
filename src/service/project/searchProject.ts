@@ -1,25 +1,33 @@
 import { prisma } from "../../config/prisma";
 import { Prisma } from '@prisma/client';
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { SearchProjectResponse, ProjectResponse } from "../../types/project"
+import { Response, Request, RequestHandler } from "express";
+import { BasicResponse } from "../../types";
+import { SearchProjectResponse, ProjectResponse, SearchProjectQuery } from "../../types/project"
 
 // 프로젝트 검색
 
 const PAGE_SIZE = 10
 
-export const searchProject = async (
-  req: AuthenticatedRequest,
+export const searchProjectHandler: RequestHandler<
+  unknown,
+  SearchProjectResponse | BasicResponse,
+  unknown,
+  SearchProjectQuery
+> = (req, res) => {
+  searchProject(req, res);
+};
+
+const searchProject = async (
+  req: Request<unknown, SearchProjectResponse | BasicResponse, unknown, SearchProjectQuery>,
   res: Response<BasicResponse | SearchProjectResponse>
 ) => {
   try {
     const userId = req.userId ?? undefined;
-    const keywordRaw = req.query.keyword;
-    const keyword = typeof keywordRaw === 'string' ? keywordRaw.trim() : '';
+
+    const keyword = (req.query.keyword ?? "").toString().trim();
     const rawOffset = Number(req.query.offset);
     const offset = Number.isInteger(rawOffset) && rawOffset > 0 ? rawOffset : 1;
-    const pageIndex = offset - 1;
-    const skipAmount = PAGE_SIZE * pageIndex;
+    const skip = PAGE_SIZE * (offset - 1);
 
     const whereCondition: Prisma.ProjectWhereInput = keyword
     ? {
@@ -38,21 +46,19 @@ export const searchProject = async (
           authorCategory: true,
           introduction: true,
           image: true,
-          ...(userId && {
+          ...userId && {
             _count: {
               select: { mark: { where: { userId } } }
             }
-          })
+          }
         },
         where: whereCondition,
-        skip: skipAmount,
+        skip,
         take: PAGE_SIZE,
         orderBy: { projectName: 'asc' }
       }),
 
-      prisma.project.count({
-        where: whereCondition
-      })
+      prisma.project.count({ where: whereCondition })
     ])
 
     const formattedProjects: ProjectResponse[] = projects.map((project) => ({
@@ -61,7 +67,7 @@ export const searchProject = async (
       authorCategory: project.authorCategory,
       introduction: project.introduction,
       image: project.image,
-      isMark: userId ? Boolean(project._count.mark) : null
+      isMark: userId ? Boolean(project._count?.mark) : null
     }))
 
     return res.status(200).json({

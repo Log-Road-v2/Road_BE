@@ -1,14 +1,18 @@
 import { ProjectState, prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
+import { RequestHandler, Request, Response } from "express";
+import { BasicResponse } from "../../types";
 import { RegisterProjectBody } from "../../types/project";
 import { validateProjectInput } from "../../utils/validation"
 
 // 프로젝트 생성
 
-export const createProject = async (
-  req: AuthenticatedRequest<{}, {}, RegisterProjectBody>,
-  res: Response<BasicResponse>
+export const createProjectHandler: RequestHandler <unknown, BasicResponse | RegisterProjectBody> = (req, res) => {
+  createProject(req, res)
+}
+
+const createProject = async (
+  req: Request<unknown, BasicResponse | RegisterProjectBody>,
+  res: Response<RegisterProjectBody | BasicResponse>
 ) => {
   try {
     const userId = req.userId;
@@ -28,7 +32,12 @@ export const createProject = async (
     const contestId = BigInt(req.body.contestId)
     const filteredSkills = validationResult.filteredSkills || [];
     const filteredMembers = validationResult.filteredMembers || [];
+
     const { projectName, authorCategory, teamName, introduction, description, startDate, endDate, image, video } = req.body
+
+    if (!contestId || !projectName || !authorCategory || !startDate || !endDate) {
+      return res.status(400).json({ message: "필수 입력값이 누락되었습니다." });
+    }
 
     const contest = await prisma.contest.findUnique({
       where: { id: contestId },
@@ -37,6 +46,29 @@ export const createProject = async (
     if (!contest) {
       return res.status(404).json({
         message: "해당 대회를 찾을 수 없습니다.",
+      });
+    }
+
+    const now = new Date();
+    if (now < new Date(contest.startDate)) {
+      return res.status(400).json({ message: "아직 제출 기간이 아닙니다." });
+    }
+
+    if (new Date(contest.endDate) < now) {
+      return res.status(400).json({
+        message: "이미 마감된 대회에는 프로젝트를 제출할 수 없습니다.",
+      });
+    }
+
+    if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
+      return res.status(400).json({
+        message: "시작일과 종료일을 올바르게 입력해주세요.",
+      });
+    }
+
+    if (authorCategory === 'TEAM' && !teamName) {
+      return res.status(400).json({
+        message: "팀 프로젝트인 경우 팀 이름은 필수입니다.",
       });
     }
 

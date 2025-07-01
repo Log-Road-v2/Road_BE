@@ -1,13 +1,13 @@
 import { Author, ProjectState } from '../config/prisma'
 
 export interface StudentResponse {
-  studentId: bigint
+  studentId: string
   name?: string
 }
 
 export interface ProjectBase {
-  projectId: bigint | null
-  contestId: bigint
+  projectId: string | null
+  contestId: string
   projectName: string
   authorCategory: Author
   teamName?: string | null
@@ -22,8 +22,8 @@ export interface ProjectBase {
 }
 
 export interface RegisterProjectBody {
-  projectId: bigint | null,
-  contestId: number
+  projectId: string | null,
+  contestId: string
   projectName: string
   authorCategory: Author
   teamName: string | null
@@ -35,10 +35,6 @@ export interface RegisterProjectBody {
   endDate: Date | string
   image: string
   video: string
-}
-
-export interface ModifyProjectRequest extends ProjectBase {
-  projectId: bigint
 }
 
 export interface ProjectResponse {
@@ -94,9 +90,10 @@ export interface GetDraftProjectResponse {
   video: string | null
 }
 
-export interface SearchProjectParam {
+export interface SearchProjectQuery {
+  [key: string]: string | undefined
   keyword: string
-  offset: number
+  offset: string
 }
 
 export interface SearchProjectResponse {
@@ -106,6 +103,7 @@ export interface SearchProjectResponse {
 }
 
 export interface SearchKeywordQuery {
+  [key: string]: string | undefined
   keyword: string
 }
 
@@ -122,12 +120,17 @@ export interface StudentDetail {
 }
 
 export interface ProjectIdParam {
-  projectId: bigint
+  [key: string]: string
+  projectId: string
+}
+
+export interface RequestUser {
+  userId: string
 }
 
 export interface GetArchivesParam {
-  contestId: bigint,
-  offset: number
+  [key: string]: string
+  contestId: string,
 }
 
 export interface ValidationSuccess {

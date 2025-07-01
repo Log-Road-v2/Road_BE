@@ -1,25 +1,28 @@
 import { prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { GetArchivesResponse, ProjectResponse } from "../../types/project";
+import { RequestHandler, Response, Request } from "express";
+import { BasicResponse } from "../../types";
+import { GetArchivesResponse, ProjectResponse, GetArchivesParam, SearchProjectQuery } from "../../types/project";
 import { formatDate } from "../../utils/regex";
 
 // 아카이브 조회
 
 const PAGE_SIZE = 10
 
-export const getArchives = async (
-  req: AuthenticatedRequest,
+export const archivesHandler: RequestHandler<GetArchivesParam, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery> = (req, res) => {
+  getArchives(req, res)
+}
+
+const getArchives = async (
+  req: Request<GetArchivesParam, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery>,
   res: Response<BasicResponse | GetArchivesResponse>
 ) => {
   try {
     const userId = req.userId ?? undefined
+    const { contestId } = req.params;
 
-    const contestId = req.params.contestId
     const rawOffset = Number(req.query.offset);
-    const offset = isNaN(rawOffset) || rawOffset < 1 ? 1 : rawOffset;
-    const pageIndex = Math.max((isNaN(offset) ? 1 : offset) - 1, 0);
-    const skipAmount = PAGE_SIZE * pageIndex;
+    const offset = Number.isInteger(rawOffset) && rawOffset > 0 ? rawOffset : 1;
+    const skip = PAGE_SIZE * (offset - 1);
 
     const contest = await prisma.contest.findUnique({
       where: { id: BigInt(contestId) },
@@ -32,10 +35,8 @@ export const getArchives = async (
       }
     })
 
-    if(!contest) {
-      return res.status(404).json({
-        message: "해당 대회가 없습니다"
-      })
+    if (!contest) {
+      return res.status(404).json({ message: "해당 대회가 없습니다" });
     }
 
     const [projects, totalProjectCount] = await prisma.$transaction([
@@ -46,19 +47,21 @@ export const getArchives = async (
           authorCategory: true,
           introduction: true,
           image: true,
-          ...(userId && {mark: {
-            where: { userId },
-            select: { id: true },
-            take: 1,
-          }}),
+          ...(userId && {
+            mark: {
+              where: { userId },
+              select: { id: true },
+              take: 1,
+            },
+          }),
         },
-        where: { contestId },
-        skip: skipAmount,
+        where: { contestId: BigInt(contestId) },
+        skip,
         take: PAGE_SIZE,
-        orderBy: {projectName: 'asc'}
+        orderBy: { projectName: 'asc' }
       }),
       prisma.project.count({
-        where: { contestId }
+        where: { contestId: BigInt(contestId) }
       })
     ])
 
@@ -68,7 +71,7 @@ export const getArchives = async (
       authorCategory: project.authorCategory,
       introduction: project.introduction,
       image: project.image,
-      isMark: userId ? (project.mark && project.mark.length > 0 ? true : false) : null
+      isMark: userId ? project.mark?.length > 0 : null,
     }));
 
     const response: GetArchivesResponse = {
