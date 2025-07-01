@@ -1,21 +1,21 @@
-import { createProject } from "./project/createProject"
-import { getArchives } from "./project/getArchives"
-import { getProjectDetail } from "./project/getProjectDetail"
-import { loadTempSavedProject } from "./project/loadTempSavedProject"
-import { searchProject } from "./project/searchProject"
-import { searchStudent } from "./project/searchStudent"
-import { tempSaveProject } from "./project/tempSaveProject"
-import { toggleProjectBookmark } from "./project/toggleProjectBookmark"
-import { updateProject } from "./project/updateProject"
+import { createProjectHandler } from "./project/createProject"
+import { archivesHandler } from "./project/getArchives"
+import { getProjectDetailHandler } from "./project/getProjectDetail"
+import { loadTempSavedProjectHandler } from "./project/loadTempSavedProject"
+import { searchProjectHandler } from "./project/searchProject"
+import { searchStudentHandler } from "./project/searchStudent"
+import { tempSaveProjectHandler } from "./project/tempSaveProject"
+import { toggleProjectBookmarkHandler } from "./project/toggleProjectBookmark"
+import { updateProjectHandler } from "./project/updateProject"
 
 export default {
-  createProject,
-  getArchives,
-  getProjectDetail,
-  loadTempSavedProject,
-  searchProject,
-  searchStudent,
-  tempSaveProject,
-  toggleProjectBookmark,
-  updateProject
+  createProjectHandler,
+  archivesHandler,
+  getProjectDetailHandler,
+  loadTempSavedProjectHandler,
+  searchProjectHandler,
+  searchStudentHandler,
+  tempSaveProjectHandler,
+  toggleProjectBookmarkHandler,
+  updateProjectHandler,
 }

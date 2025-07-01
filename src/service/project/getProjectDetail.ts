@@ -1,13 +1,28 @@
 import { prisma } from "../../config/prisma";
-import { Response } from "express";
-import { AuthenticatedRequest, BasicResponse } from "../../types";
-import { GetProjectDetailResponse, StudentResponse } from "../../types/project";
+import { RequestHandler, Response, Request } from "express";
+import { BasicResponse } from "../../types";
+import { GetProjectDetailResponse, StudentResponse, ProjectIdParam } from "../../types/project";
 import { formatDate } from "../../utils/regex";
 
 // 프로젝트 상세 조회
 
+const parseSkills = (skills?: string): string[] =>
+  skills?.split(",").map(s => s.trim()).filter(Boolean) || [];
+
+  const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
+  members
+    .filter(({ student }) => student !== null)
+    .map(({ student }) => ({
+      studentId: student!.id.toString(),
+      name: student!.name || undefined,
+    }));
+
+export const getProjectDetailHandler: RequestHandler <ProjectIdParam, GetProjectDetailResponse | BasicResponse> = (req, res) => {
+  getProjectDetail(req, res);
+}
+
 export const getProjectDetail = async (
-  req: AuthenticatedRequest,
+  req: Request<ProjectIdParam, GetProjectDetailResponse | BasicResponse>,
   res: Response<BasicResponse | GetProjectDetailResponse>
 ) => {
   try {
@@ -15,7 +30,7 @@ export const getProjectDetail = async (
     const { projectId } = req.params;
 
     const project = await prisma.project.findUnique({
-      where: { id: projectId },
+      where: { id: BigInt(projectId) },
       select: {
         projectName: true,
         authorCategory: true,
@@ -49,20 +64,12 @@ export const getProjectDetail = async (
       })
     }
 
-    const skillsArray = project.skills
-    ? project.skills.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0)
-    : [];
-
-    const memberList: StudentResponse[] = (project.member ?? [])
-    .filter(({ student }) => student !== null)
-    .map(({ student }) => ({
-      studentId: student!.id,
-      name: student!.name || undefined,
-    }));
+    const skillsArray = parseSkills(project.skills ?? undefined);
+    const memberList = mapMembers(project.member ?? []);
 
     const result: GetProjectDetailResponse = {
       contestName: project.contest.name,
-      isMark: project.mark.length > 0,
+      isMark: !!project.mark?.length,
       isWriter: project.writerId === userId,
       projectName: project.projectName,
       authorCategory: project.authorCategory,
@@ -79,7 +86,6 @@ export const getProjectDetail = async (
     };
 
     return res.status(200).json(result)
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({
