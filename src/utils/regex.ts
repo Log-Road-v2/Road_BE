@@ -23,6 +23,6 @@ export const formatMembers = <
         m.studentId != null
     )
     .map((m) => ({
-      studentId: BigInt(m.studentId).toString(),
+      studentId: m.studentId.toString(),
       name: m.student?.name,
     }));
