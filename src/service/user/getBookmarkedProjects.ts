@@ -1,12 +1,16 @@
 import { prisma } from '../../config/prisma';
-import { Response } from 'express';
-import { AuthenticatedRequest, BasicResponse } from '../../types';
-import { GetBookmarkedProjectsResponse, ProjectResponse } from '../../types/user';
+import { RequestHandler, Response, Request } from 'express';
+import { BasicResponse } from '../../types';
+import { GetBookmarkedProjectsResponse, ProjectResponse, OffsetQuery } from '../../types/user';
 
 const PAGE_SIZE = 10;
 
-export const getBookmarkedProjects = async (
-  req: AuthenticatedRequest,
+export const getBookmarkedProjectsHandler: RequestHandler <unknown, BasicResponse | GetBookmarkedProjectsResponse, unknown, OffsetQuery> = (req, res) => {
+  getBookmarkedProjects(req, res);
+}
+
+const getBookmarkedProjects = async (
+  req: Request<unknown, BasicResponse | GetBookmarkedProjectsResponse, unknown, OffsetQuery>,
   res: Response<BasicResponse | GetBookmarkedProjectsResponse>
 ) => {
   try {
@@ -19,12 +23,12 @@ export const getBookmarkedProjects = async (
     const offsetNumber = Math.max(Number(rawOffset ?? 1), 1);
     const skip = PAGE_SIZE * (offsetNumber - 1);
 
-    const [markedProjects, totalProjects] = await prisma.$transaction([
+    const [marks, total] = await prisma.$transaction([
       prisma.mark.findMany({
         where: { userId },
         skip,
         take: PAGE_SIZE,
-        orderBy: [{ id: 'asc' }],
+        orderBy: { id: 'asc' },
         select: {
           project: {
             select: {
@@ -37,12 +41,10 @@ export const getBookmarkedProjects = async (
           },
         },
       }),
-      prisma.mark.count({
-        where: { userId },
-      }),
+      prisma.mark.count({ where: { userId } }),
     ]);
 
-    const projects: ProjectResponse[] = markedProjects.map(({ project }) => ({
+    const projects: ProjectResponse[] = marks.map(({ project }) => ({
       id: project.id.toString(),
       projectName: project.projectName,
       introduction: project.introduction ?? '',
@@ -53,12 +55,11 @@ export const getBookmarkedProjects = async (
 
     return res.status(200).json({
       offset: offsetNumber,
-      totalProjects,
+      totalProjects: total,
       projects,
     });
-
   } catch (error) {
-    console.error('getBookmarkedProjects Error:', error);
+    console.error(error);
     return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 };

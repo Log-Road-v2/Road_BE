@@ -1,10 +1,17 @@
 import { Role, prisma } from '../../config/prisma';
-import { Response } from 'express';
-import { AuthenticatedRequest, BasicResponse } from '../../types';
+import { Response, Request, RequestHandler } from 'express';
+import { BasicResponse } from '../../types';
 import { GetStudentInfoResponse, GetTeacherInfoResponse } from '../../types/user';
 
-export const getUserInfo = async (
-  req: AuthenticatedRequest,
+export const getUserInfoHandler: RequestHandler <
+  unknown,
+  BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse
+  > = (req, res) => {
+  getUserInfo(req, res)
+}
+
+const getUserInfo = async (
+  req: Request<unknown, BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse>,
   res: Response<BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse>
 ) => {
   try {
