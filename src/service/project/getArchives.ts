@@ -17,8 +17,8 @@ export const archivesHandler: RequestHandler<
   GetArchivesResponse | BasicResponse,
   unknown,
   SearchProjectQuery
-> = (req, res) => {
-  getArchives(req, res);
+> = async (req, res) => {
+  await getArchives(req, res);
 };
 
 const getArchives = async (

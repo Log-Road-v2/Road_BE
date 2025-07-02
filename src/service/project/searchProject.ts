@@ -17,8 +17,8 @@ export const searchProjectHandler: RequestHandler<
   SearchProjectResponse | BasicResponse,
   unknown,
   SearchProjectQuery
-> = (req, res) => {
-  searchProject(req, res);
+> = async (req, res) => {
+  await searchProject(req, res);
 };
 
 const searchProject = async (

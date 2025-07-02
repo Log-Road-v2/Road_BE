@@ -8,8 +8,11 @@ if (!IMAGE_SERVER_URL) {
   throw Error('image server url get failed from env');
 }
 
-export const getJoinedProjectsHandler: RequestHandler<unknown, BasicResponse | GetProjectResponse> = (req, res) => {
-  getJoinedProjects(req, res);
+export const getJoinedProjectsHandler: RequestHandler<unknown, BasicResponse | GetProjectResponse> = async (
+  req,
+  res
+) => {
+  await getJoinedProjects(req, res);
 };
 
 const getJoinedProjects = async (
