@@ -24,7 +24,10 @@ app.post(
   '/storage',
   apiLimit,
   verifyJWT,
-  upload.fields([{ name: 'image' }, { name: 'video' }]),
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'video', maxCount: 1 }
+  ]),
   project.tempSaveProjectHandler
 );
 app.get('/storage/:projectId', getApiLimit, verifyJWT, project.loadTempSavedProjectHandler);
