@@ -3,6 +3,7 @@ import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { RegisterProjectBody, StudentResponse } from '../../types/project';
 import { ProjectState } from '../../config/prisma';
+import { getRelativePath } from '../../utils/format';
 
 // 임시 저장
 
@@ -37,9 +38,14 @@ export const tempSaveProject = async (
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     const image = files?.['image'][0] ?? null;
     const video = files?.['video'][0] ?? null;
+    const imageUri = image ? getRelativePath(image.path) : null;
+    const videoUri = video ? getRelativePath(video.path) : null;
 
     const projectId = rawProjectId ? BigInt(rawProjectId) : null;
     const contestId = BigInt(rawContestId);
+
+    const skillsJson = JSON.parse(skills) as string[];
+    const skillsList = skillsJson.filter((s) => s.trim().length > 0) || [];
 
     const contest = await prisma.contest.findUnique({
       where: { id: contestId }
@@ -54,13 +60,13 @@ export const tempSaveProject = async (
       projectName,
       authorCategory,
       teamName,
-      skills: Array.isArray(skills) && skills.length ? skills.join(',') : null,
+      skills: Array.isArray(skillsList) && skillsList.length ? skillsList.join(',') : null,
       introduction,
       description,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
-      image: image?.path,
-      video: video?.path,
+      image: imageUri,
+      video: videoUri,
       state: ProjectState.WRITING
     };
 
