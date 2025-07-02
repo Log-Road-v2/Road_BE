@@ -3,14 +3,11 @@ import { prisma } from '../../config/prisma';
 import { BasicResponse } from '../../types';
 import { GetProjectResponse } from '../../types/user';
 import { ProjectState } from '@prisma/client';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 type Query = { state?: ProjectState | 'ALL' };
 
 const VALID_STATES: (ProjectState | 'ALL')[] = ['ALL', 'PENDING', 'APPROVAL', 'REJECTED', 'MODIFY', 'WRITING'];
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
 
 export const getWrittenProjectsHandler: RequestHandler<
   unknown,
@@ -57,7 +54,7 @@ export const getWrittenProjects = async (
     const formattedProjects = projects.map((project) => ({
       ...project,
       id: project.id.toString(),
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null
+      image: buildFileUrl(project.image)
     }));
 
     return res.status(200).json({ projects: formattedProjects });
