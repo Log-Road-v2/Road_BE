@@ -30,13 +30,13 @@ const sendMail = async (req: Request<unknown, BasicResponse, SendMailRequest>, r
   });
 
   try {
-    const random = crypto.randomBytes(4).toString('hex').slice(8).padStart(8, '0');
+    const random = crypto.randomBytes(4).toString('hex').slice(0, 8).padStart(8, '0');
 
     await transport.sendMail({
       from: EMAIL_ID,
       to: email,
-      subject: 'Road 임시 비밀번호',
-      text: `임시 비밀번호는 ${random}`
+      subject: 'Road 인증 코드',
+      text: `인증 코드는 ${random}`
     });
 
     await redis.set(email, random, 'EX', 600);
