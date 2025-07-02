@@ -3,6 +3,7 @@ import { RequestHandler, Request, Response } from 'express';
 import { BasicResponse } from '../../types';
 import { RegisterProjectBody } from '../../types/project';
 import { validateProjectInput } from '../../utils/validation';
+import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 생성
 export const createProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = (req, res) => {
@@ -37,6 +38,8 @@ const createProject = async (
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     const image = files?.['image'][0] ?? null;
     const video = files?.['video'][0] ?? null;
+    const imageUri = image ? getRelativePath(image.path) : null;
+    const videoUri = video ? getRelativePath(video.path) : null;
 
     if (!contestId || !projectName || !authorCategory || !startDate || !endDate) {
       return res.status(400).json({ message: '필수 입력값이 누락되었습니다.' });
@@ -86,8 +89,8 @@ const createProject = async (
       description,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
-      image: image?.path,
-      video: video?.path
+      image: imageUri,
+      video: videoUri
     };
 
     const project = projectId ? await prisma.project.findUnique({ where: { id: projectId } }) : null;
