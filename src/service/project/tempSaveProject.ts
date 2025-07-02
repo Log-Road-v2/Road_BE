@@ -11,7 +11,7 @@ export const tempSaveProjectHandler: RequestHandler<unknown, BasicResponse, Regi
   tempSaveProject(req, res);
 };
 
-export const tempSaveProject = async (
+const tempSaveProject = async (
   req: Request<unknown, BasicResponse, RegisterProjectBody>,
   res: Response<BasicResponse>
 ) => {
