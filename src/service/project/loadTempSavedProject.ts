@@ -3,14 +3,9 @@ import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { GetDraftProjectResponse, ProjectIdParam, RequestUser } from '../../types/project';
 import { formatDate, formatMembers } from '../../utils/regex';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 임시저장 불러오기
-
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
-
 export const loadTempSavedProjectHandler: RequestHandler<
   ProjectIdParam,
   GetDraftProjectResponse | BasicResponse,
@@ -98,7 +93,7 @@ const mapToDraftResponse = (
     description: project.description,
     startDate: formatDate(project.startDate),
     endDate: formatDate(project.endDate),
-    image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
-    video: project.video ? `${IMAGE_SERVER_URL}${project.video}` : null
+    image: buildFileUrl(project.image),
+    video: buildFileUrl(project.video)
   };
 };

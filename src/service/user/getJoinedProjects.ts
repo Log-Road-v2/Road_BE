@@ -2,11 +2,7 @@ import { prisma } from '../../config/prisma';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { GetProjectResponse } from '../../types/user';
-
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 export const getJoinedProjectsHandler: RequestHandler<unknown, BasicResponse | GetProjectResponse> = async (
   req,
@@ -46,7 +42,7 @@ const getJoinedProjects = async (
     const mappedProjects = projects.map((project) => ({
       ...project,
       id: project.id.toString(),
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null
+      image: buildFileUrl(project.image)
     }));
 
     return res.status(200).json({
