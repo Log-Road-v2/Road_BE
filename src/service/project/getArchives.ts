@@ -3,14 +3,11 @@ import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { GetArchivesResponse, ProjectResponse, GetArchivesParam, SearchProjectQuery } from '../../types/project';
 import { formatDate } from '../../utils/regex';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 아카이브 조회
 
 const PAGE_SIZE = 10;
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
 
 export const archivesHandler: RequestHandler<
   GetArchivesParam,
@@ -79,7 +76,7 @@ const getArchives = async (
       projectName: project.projectName,
       authorCategory: project.authorCategory,
       introduction: project.introduction,
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      image: buildFileUrl(project.image),
       isMark: userId ? project.mark?.length > 0 : null
     }));
 

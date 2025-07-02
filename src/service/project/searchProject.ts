@@ -3,14 +3,11 @@ import { Prisma } from '@prisma/client';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { SearchProjectResponse, ProjectResponse, SearchProjectQuery } from '../../types/project';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 프로젝트 검색
 
 const PAGE_SIZE = 10;
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
 
 export const searchProjectHandler: RequestHandler<
   unknown,
@@ -70,7 +67,7 @@ const searchProject = async (
       projectName: project.projectName,
       authorCategory: project.authorCategory,
       introduction: project.introduction,
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      image: buildFileUrl(project.image),
       isMark: userId ? Boolean(project._count?.mark) : null
     }));
 

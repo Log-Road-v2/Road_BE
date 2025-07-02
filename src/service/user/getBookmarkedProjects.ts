@@ -2,12 +2,9 @@ import { prisma } from '../../config/prisma';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { GetBookmarkedProjectsResponse, ProjectResponse, OffsetQuery } from '../../types/user';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 const PAGE_SIZE = 10;
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
 
 export const getBookmarkedProjectsHandler: RequestHandler<
   unknown,
@@ -58,7 +55,7 @@ const getBookmarkedProjects = async (
       projectName: project.projectName,
       introduction: project.introduction ?? '',
       authorCategory: project.authorCategory,
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      image: buildFileUrl(project.image),
       isMark: true
     }));
 

@@ -3,14 +3,9 @@ import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { GetProjectDetailResponse, StudentResponse, ProjectIdParam } from '../../types/project';
 import { formatDate } from '../../utils/regex';
+import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 프로젝트 상세 조회
-
-const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
-if (!IMAGE_SERVER_URL) {
-  throw Error('image server url get failed from env');
-}
-
 const parseSkills = (skills?: string): string[] =>
   skills
     ?.split(',')
@@ -91,8 +86,8 @@ const getProjectDetail = async (
       description: project.description,
       startDate: formatDate(project.startDate),
       endDate: formatDate(project.endDate),
-      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
-      video: project.video ? `${IMAGE_SERVER_URL}${project.video}` : null,
+      image: buildFileUrl(project.image),
+      video: buildFileUrl(project.video),
       state: project.state
     };
 
