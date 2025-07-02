@@ -4,6 +4,7 @@ import { createTransport } from 'nodemailer';
 import { SendMailRequest } from '../../types/auth';
 import { BasicResponse } from '../../types';
 import crypto from 'crypto';
+import { sendMailBody } from '../../utils/sendMailBody';
 
 const EMAIL_ID = process.env.EMAIL_ID;
 const EMAIL_PW = process.env.EMAIL_PW;
@@ -33,7 +34,7 @@ const sendMail = async (req: Request<unknown, BasicResponse, SendMailRequest>, r
       from: EMAIL_ID,
       to: email,
       subject: 'Road 인증 코드',
-      text: `인증 코드는 ${random}`
+      html: sendMailBody(random)
     });
 
     await redis.set(email, random, 'EX', 600);
