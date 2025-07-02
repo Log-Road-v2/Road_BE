@@ -2,6 +2,7 @@ import express from 'express';
 import cors, { CorsOptions } from 'cors';
 import { configDotenv } from 'dotenv';
 import router from './controller';
+import path from 'path';
 
 configDotenv();
 const port: Number = Number(process.env.PORT!) || 8080;
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsOptions));
 
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/', router);
 
 app.listen(port, () => {

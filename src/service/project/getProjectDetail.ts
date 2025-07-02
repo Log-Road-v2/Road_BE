@@ -1,25 +1,36 @@
-import { prisma } from "../../config/prisma";
-import { RequestHandler, Response, Request } from "express";
-import { BasicResponse } from "../../types";
-import { GetProjectDetailResponse, StudentResponse, ProjectIdParam } from "../../types/project";
-import { formatDate } from "../../utils/regex";
+import { prisma } from '../../config/prisma';
+import { RequestHandler, Response, Request } from 'express';
+import { BasicResponse } from '../../types';
+import { GetProjectDetailResponse, StudentResponse, ProjectIdParam } from '../../types/project';
+import { formatDate } from '../../utils/regex';
 
 // 프로젝트 상세 조회
 
-const parseSkills = (skills?: string): string[] =>
-  skills?.split(",").map(s => s.trim()).filter(Boolean) || [];
+const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
+if (!IMAGE_SERVER_URL) {
+  throw Error('image server url get failed from env');
+}
 
-  const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
+const parseSkills = (skills?: string): string[] =>
+  skills
+    ?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean) || [];
+
+const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
   members
     .filter(({ student }) => student !== null)
     .map(({ student }) => ({
       studentId: student!.id.toString(),
-      name: student!.name || undefined,
+      name: student!.name || undefined
     }));
 
-export const getProjectDetailHandler: RequestHandler <ProjectIdParam, GetProjectDetailResponse | BasicResponse> = (req, res) => {
+export const getProjectDetailHandler: RequestHandler<ProjectIdParam, GetProjectDetailResponse | BasicResponse> = (
+  req,
+  res
+) => {
   getProjectDetail(req, res);
-}
+};
 
 export const getProjectDetail = async (
   req: Request<ProjectIdParam, GetProjectDetailResponse | BasicResponse>,
@@ -53,15 +64,15 @@ export const getProjectDetail = async (
         mark: {
           where: { userId },
           select: { id: true },
-          take: 1,
-        },
+          take: 1
+        }
       }
-    })
+    });
 
-    if(!project) {
+    if (!project) {
       return res.status(404).json({
         message: '요청한 정보가 존재하지 않습니다'
-      })
+      });
     }
 
     const skillsArray = parseSkills(project.skills ?? undefined);
@@ -80,16 +91,16 @@ export const getProjectDetail = async (
       description: project.description,
       startDate: formatDate(project.startDate),
       endDate: formatDate(project.endDate),
-      image: project.image,
-      video: project.video,
-      state: project.state,
+      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      video: project.video ? `${IMAGE_SERVER_URL}${project.video}` : null,
+      state: project.state
     };
 
-    return res.status(200).json(result)
+    return res.status(200).json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       message: '서버 오류 발생'
-    })
+    });
   }
-}
+};
