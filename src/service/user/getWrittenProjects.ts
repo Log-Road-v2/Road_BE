@@ -1,23 +1,25 @@
 import { Response, Request, RequestHandler } from 'express';
 import { prisma } from '../../config/prisma';
-import { BasicResponse } from "../../types";
-import { GetProjectResponse } from "../../types/user";
-import { ProjectState } from "@prisma/client";
+import { BasicResponse } from '../../types';
+import { GetProjectResponse } from '../../types/user';
+import { ProjectState } from '@prisma/client';
 
 type Query = { state?: ProjectState | 'ALL' };
 
-const VALID_STATES: (ProjectState | 'ALL')[] = [
-  'ALL', 'PENDING', 'APPROVAL', 'REJECTED', 'MODIFY', 'WRITING',
-];
+const VALID_STATES: (ProjectState | 'ALL')[] = ['ALL', 'PENDING', 'APPROVAL', 'REJECTED', 'MODIFY', 'WRITING'];
+const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
+if (!IMAGE_SERVER_URL) {
+  throw Error('image server url get failed from env');
+}
 
-export const getWrittenProjectsHandler: RequestHandler <
+export const getWrittenProjectsHandler: RequestHandler<
   unknown,
   BasicResponse | GetProjectResponse,
   unknown,
-  { state?: ProjectState | "ALL" }
+  { state?: ProjectState | 'ALL' }
 > = (req, res) => {
   getWrittenProjects(req, res);
-}
+};
 
 export const getWrittenProjects = async (
   req: Request<unknown, BasicResponse | GetProjectResponse, unknown, Query>,
@@ -40,21 +42,22 @@ export const getWrittenProjects = async (
     const projects = await prisma.project.findMany({
       where: {
         writerId: userId,
-        ...(isAll ? {} : { state: rawState as ProjectState }),
+        ...(isAll ? {} : { state: rawState as ProjectState })
       },
       select: {
         id: true,
         projectName: true,
         introduction: true,
         authorCategory: true,
-        image: true,
+        image: true
       },
-      orderBy: { projectName: 'asc' },
+      orderBy: { projectName: 'asc' }
     });
 
-    const formattedProjects = projects.map(project => ({
+    const formattedProjects = projects.map((project) => ({
       ...project,
       id: project.id.toString(),
+      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null
     }));
 
     return res.status(200).json({ projects: formattedProjects });
