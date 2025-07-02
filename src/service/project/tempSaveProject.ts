@@ -81,7 +81,7 @@ export const tempSaveProject = async (
           data: data
         });
       }
-      if (members && members.length) {
+      if (members?.length) {
         const member = JSON.parse(members) as StudentResponse[];
         const memberData = member.map((m) => ({
           studentId: BigInt(m.studentId),
