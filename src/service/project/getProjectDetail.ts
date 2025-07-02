@@ -91,8 +91,8 @@ export const getProjectDetail = async (
       description: project.description,
       startDate: formatDate(project.startDate),
       endDate: formatDate(project.endDate),
-      image: `${IMAGE_SERVER_URL}${project.image}`,
-      video: `${IMAGE_SERVER_URL}${project.video}`,
+      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      video: project.video ? `${IMAGE_SERVER_URL}${project.video}` : null,
       state: project.state
     };
 
