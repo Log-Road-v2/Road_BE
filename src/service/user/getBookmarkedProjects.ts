@@ -4,10 +4,19 @@ import { BasicResponse } from '../../types';
 import { GetBookmarkedProjectsResponse, ProjectResponse, OffsetQuery } from '../../types/user';
 
 const PAGE_SIZE = 10;
-
-export const getBookmarkedProjectsHandler: RequestHandler <unknown, BasicResponse | GetBookmarkedProjectsResponse, unknown, OffsetQuery> = (req, res) => {
-  getBookmarkedProjects(req, res);
+const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
+if (!IMAGE_SERVER_URL) {
+  throw Error('image server url get failed from env');
 }
+
+export const getBookmarkedProjectsHandler: RequestHandler<
+  unknown,
+  BasicResponse | GetBookmarkedProjectsResponse,
+  unknown,
+  OffsetQuery
+> = async (req, res) => {
+  await getBookmarkedProjects(req, res);
+};
 
 const getBookmarkedProjects = async (
   req: Request<unknown, BasicResponse | GetBookmarkedProjectsResponse, unknown, OffsetQuery>,
@@ -36,12 +45,12 @@ const getBookmarkedProjects = async (
               projectName: true,
               introduction: true,
               authorCategory: true,
-              image: true,
-            },
-          },
-        },
+              image: true
+            }
+          }
+        }
       }),
-      prisma.mark.count({ where: { userId } }),
+      prisma.mark.count({ where: { userId } })
     ]);
 
     const projects: ProjectResponse[] = marks.map(({ project }) => ({
@@ -49,14 +58,14 @@ const getBookmarkedProjects = async (
       projectName: project.projectName,
       introduction: project.introduction ?? '',
       authorCategory: project.authorCategory,
-      image: project.image ?? '',
-      isMark: true,
+      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      isMark: true
     }));
 
     return res.status(200).json({
       offset: offsetNumber,
       totalProjects: total,
-      projects,
+      projects
     });
   } catch (error) {
     console.error(error);

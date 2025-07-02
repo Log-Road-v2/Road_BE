@@ -6,8 +6,8 @@ import { validateProjectInput } from '../../utils/validation';
 import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 생성
-export const createProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = (req, res) => {
-  createProject(req, res);
+export const createProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = async (req, res) => {
+  await createProject(req, res);
 };
 
 const createProject = async (
