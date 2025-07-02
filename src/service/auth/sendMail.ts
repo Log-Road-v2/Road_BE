@@ -20,9 +20,6 @@ const sendMail = async (req: Request<unknown, BasicResponse, SendMailRequest>, r
 
   const transport = createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
     auth: {
       user: EMAIL_ID,
       pass: EMAIL_PW
