@@ -27,8 +27,8 @@ export function validateProjectInput(body: RegisterProjectBody): ValidationResul
       return { valid: false, message: '시작일은 종료일보다 빠를 수 없습니다.' };
     }
 
-    const skill = JSON.parse(skills) as string[];
-    const filteredSkills = skill.filter((s) => s.trim().length > 0) || [];
+    const skillsJson = JSON.parse(skills) as string[];
+    const filteredSkills = skillsJson.filter((s) => s.trim().length > 0) || [];
     if (filteredSkills.length === 0) {
       return { valid: false, message: '기술 스택을 입력해주세요.' };
     }
