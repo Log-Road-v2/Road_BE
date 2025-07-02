@@ -1,23 +1,32 @@
-import { prisma } from "../../config/prisma";
-import { RequestHandler, Response, Request } from "express";
-import { BasicResponse } from "../../types";
-import { GetArchivesResponse, ProjectResponse, GetArchivesParam, SearchProjectQuery } from "../../types/project";
-import { formatDate } from "../../utils/regex";
+import { prisma } from '../../config/prisma';
+import { RequestHandler, Response, Request } from 'express';
+import { BasicResponse } from '../../types';
+import { GetArchivesResponse, ProjectResponse, GetArchivesParam, SearchProjectQuery } from '../../types/project';
+import { formatDate } from '../../utils/regex';
 
 // 아카이브 조회
 
-const PAGE_SIZE = 10
-
-export const archivesHandler: RequestHandler<GetArchivesParam, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery> = (req, res) => {
-  getArchives(req, res)
+const PAGE_SIZE = 10;
+const IMAGE_SERVER_URL = process.env.IMAGE_SERVER_URL;
+if (!IMAGE_SERVER_URL) {
+  throw Error('image server url get failed from env');
 }
+
+export const archivesHandler: RequestHandler<
+  GetArchivesParam,
+  GetArchivesResponse | BasicResponse,
+  unknown,
+  SearchProjectQuery
+> = (req, res) => {
+  getArchives(req, res);
+};
 
 const getArchives = async (
   req: Request<GetArchivesParam, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery>,
   res: Response<BasicResponse | GetArchivesResponse>
 ) => {
   try {
-    const userId = req.userId ?? undefined
+    const userId = req.userId ?? undefined;
     const { contestId } = req.params;
 
     const rawOffset = Number(req.query.offset);
@@ -33,10 +42,10 @@ const getArchives = async (
         endDate: true,
         purpose: true
       }
-    })
+    });
 
     if (!contest) {
-      return res.status(404).json({ message: "해당 대회가 없습니다" });
+      return res.status(404).json({ message: '해당 대회가 없습니다' });
     }
 
     const [projects, totalProjectCount] = await prisma.$transaction([
@@ -51,9 +60,9 @@ const getArchives = async (
             mark: {
               where: { userId },
               select: { id: true },
-              take: 1,
-            },
-          }),
+              take: 1
+            }
+          })
         },
         where: { contestId: BigInt(contestId) },
         skip,
@@ -63,15 +72,15 @@ const getArchives = async (
       prisma.project.count({
         where: { contestId: BigInt(contestId) }
       })
-    ])
+    ]);
 
-  const formattedProjects: ProjectResponse[] = projects.map((project) => ({
+    const formattedProjects: ProjectResponse[] = projects.map((project) => ({
       id: project.id.toString(),
       projectName: project.projectName,
       authorCategory: project.authorCategory,
       introduction: project.introduction,
-      image: project.image,
-      isMark: userId ? project.mark?.length > 0 : null,
+      image: project.image ? `${IMAGE_SERVER_URL}${project.image}` : null,
+      isMark: userId ? project.mark?.length > 0 : null
     }));
 
     const response: GetArchivesResponse = {
@@ -85,13 +94,11 @@ const getArchives = async (
       projects: formattedProjects
     };
 
-    return res.status(200).json(response)
-
+    return res.status(200).json(response);
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       message: '서버 오류 발생'
-    })
+    });
   }
-}
-
+};
