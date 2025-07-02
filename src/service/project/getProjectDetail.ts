@@ -25,11 +25,11 @@ const mapMembers = (members: { student: { id: bigint; name: string } | null }[])
       name: student!.name || undefined
     }));
 
-export const getProjectDetailHandler: RequestHandler<ProjectIdParam, GetProjectDetailResponse | BasicResponse> = (
+export const getProjectDetailHandler: RequestHandler<ProjectIdParam, GetProjectDetailResponse | BasicResponse> = async (
   req,
   res
 ) => {
-  getProjectDetail(req, res);
+  await getProjectDetail(req, res);
 };
 
 const getProjectDetail = async (

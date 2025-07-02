@@ -14,8 +14,8 @@ export const getBookmarkedProjectsHandler: RequestHandler<
   BasicResponse | GetBookmarkedProjectsResponse,
   unknown,
   OffsetQuery
-> = (req, res) => {
-  getBookmarkedProjects(req, res);
+> = async (req, res) => {
+  await getBookmarkedProjects(req, res);
 };
 
 const getBookmarkedProjects = async (

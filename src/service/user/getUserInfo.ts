@@ -3,12 +3,12 @@ import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { GetStudentInfoResponse, GetTeacherInfoResponse } from '../../types/user';
 
-export const getUserInfoHandler: RequestHandler <
+export const getUserInfoHandler: RequestHandler<
   unknown,
   BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse
-  > = (req, res) => {
-  getUserInfo(req, res)
-}
+> = async (req, res) => {
+  await getUserInfo(req, res);
+};
 
 const getUserInfo = async (
   req: Request<unknown, BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse>,
@@ -25,8 +25,8 @@ const getUserInfo = async (
       select: {
         role: true,
         name: true,
-        email: true,
-      },
+        email: true
+      }
     });
 
     if (!user) {
@@ -36,7 +36,7 @@ const getUserInfo = async (
     const baseResponse = {
       role: user.role,
       name: user.name,
-      email: user.email,
+      email: user.email
     };
 
     switch (user.role) {
@@ -50,8 +50,8 @@ const getUserInfo = async (
           select: {
             grade: true,
             classNumber: true,
-            studentNumber: true,
-          },
+            studentNumber: true
+          }
         });
 
         if (!student) {
@@ -62,7 +62,7 @@ const getUserInfo = async (
           ...baseResponse,
           grade: student.grade,
           classNumber: student.classNumber,
-          studentNumber: student.studentNumber,
+          studentNumber: student.studentNumber
         });
       }
 
@@ -70,7 +70,7 @@ const getUserInfo = async (
         return res.status(400).json({ message: '알 수 없는 사용자 역할입니다.' });
     }
   } catch (error) {
-    console.error( error);
+    console.error(error);
     return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 };

@@ -7,8 +7,8 @@ import { getRelativePath } from '../../utils/format';
 
 // 임시 저장
 
-export const tempSaveProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = (req, res) => {
-  tempSaveProject(req, res);
+export const tempSaveProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = async (req, res) => {
+  await tempSaveProject(req, res);
 };
 
 const tempSaveProject = async (

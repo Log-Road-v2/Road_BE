@@ -17,8 +17,8 @@ export const getWrittenProjectsHandler: RequestHandler<
   BasicResponse | GetProjectResponse,
   unknown,
   { state?: ProjectState | 'ALL' }
-> = (req, res) => {
-  getWrittenProjects(req, res);
+> = async (req, res) => {
+  await getWrittenProjects(req, res);
 };
 
 export const getWrittenProjects = async (

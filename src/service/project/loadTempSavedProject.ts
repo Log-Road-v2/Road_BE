@@ -15,8 +15,8 @@ export const loadTempSavedProjectHandler: RequestHandler<
   ProjectIdParam,
   GetDraftProjectResponse | BasicResponse,
   RequestUser
-> = (req, res) => {
-  loadTempSavedProject(req, res);
+> = async (req, res) => {
+  await loadTempSavedProject(req, res);
 };
 
 const loadTempSavedProject = async (

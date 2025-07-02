@@ -8,11 +8,11 @@ import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 글 수정
 
-export const updateProjectHandler: RequestHandler<ProjectIdParam, RegisterProjectBody | BasicResponse | RequestUser> = (
-  req,
-  res
-) => {
-  updateProject(req, res);
+export const updateProjectHandler: RequestHandler<
+  ProjectIdParam,
+  RegisterProjectBody | BasicResponse | RequestUser
+> = async (req, res) => {
+  await updateProject(req, res);
 };
 
 const updateProject = async (
