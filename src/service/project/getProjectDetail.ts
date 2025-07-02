@@ -32,7 +32,7 @@ export const getProjectDetailHandler: RequestHandler<ProjectIdParam, GetProjectD
   getProjectDetail(req, res);
 };
 
-export const getProjectDetail = async (
+const getProjectDetail = async (
   req: Request<ProjectIdParam, GetProjectDetailResponse | BasicResponse>,
   res: Response<BasicResponse | GetProjectDetailResponse>
 ) => {
