@@ -57,6 +57,28 @@ export interface GetArchivesResponse {
   projects: ProjectResponse[];
 }
 
+export interface getRankResponse {
+  contestId: string;
+  name: string;
+  startDate: Date | string;
+  endDate: Date | string;
+  awards: AwardResponse[];
+  projects: RankProjectResponse[];
+}
+
+export interface RankProjectResponse {
+  id: string;
+  projectName: string;
+  authorCategory: Author;
+  introduction: string | null;
+  image: string | null;
+  award: string;
+}
+
+export interface AwardResponse {
+  name: string;
+}
+
 export interface GetProjectDetailResponse {
   contestName: string;
   isMark: boolean | null;
