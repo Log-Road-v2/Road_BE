@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import vote from '../service/vote';
 import { getApiLimit } from '../middleware/limit';
 import { verifyJWT } from '../middleware/jwt';
