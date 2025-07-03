@@ -32,6 +32,6 @@ app.post(
 );
 app.get('/storage/:projectId', getApiLimit, verifyJWT, project.loadTempSavedProjectHandler);
 app.post('/:projectId/mark', apiLimit, verifyJWT, project.toggleProjectBookmarkHandler);
+app.get('/rank/:contestId', getApiLimit, project.rankingHandler);
 app.get('/:contestId', getApiLimit, project.archivesHandler);
-
 export default app;
