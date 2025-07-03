@@ -35,9 +35,9 @@ const voteList = async (
 
     const result: MyVoteResponse = {
       project: votes.map((vote: any) => ({
-        id: vote.id.toString(),
+        id: vote.id,
         projectId: vote.projectId.toString(),
-        rank: vote.rank.toString()
+        rank: vote.rank
       }))
     };
 

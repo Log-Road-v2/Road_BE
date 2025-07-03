@@ -1,9 +1,9 @@
 import { Author } from '../config/prisma';
 
 export interface MyVoteItem {
-  id: string;
+  id: number;
   projectId: string;
-  rank: string;
+  rank: number;
 }
 
 export interface MyVoteResponse {
