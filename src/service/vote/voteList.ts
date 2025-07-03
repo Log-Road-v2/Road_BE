@@ -1,10 +1,21 @@
-import { Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { voteListResponse } from '../../types/vote';
-import { AuthenticatedRequest, BasicResponse } from '../../types';
+import { BasicResponse } from '../../types';
 import { Project } from '../../types/vote';
 
-export const voteList = async (req: AuthenticatedRequest, res: Response<voteListResponse | BasicResponse>) => {
+export const voteListHandler: RequestHandler<
+  { contestId: string },
+  BasicResponse | voteListResponse,
+  unknown
+> = async (req, res) => {
+  await voteList(req, res);
+};
+
+const voteList = async (
+  req: Request<{ contestId: string }, BasicResponse | voteListResponse, unknown>,
+  res: Response<BasicResponse | voteListResponse>
+) => {
   try {
     const contestId = BigInt(req.params.contestId);
     const contest = await prisma.contest.findUnique({

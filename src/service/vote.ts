@@ -1,7 +1,9 @@
-// import { myVote } from './vote/myVote';
-// import { vote } from './vote/vote';
-import { voteList } from './vote/voteList';
+import { myVoteHandler } from './vote/myVote';
+import { voteHandler } from './vote/vote';
+import { voteListHandler } from './vote/voteList';
 
 export default {
-  voteList
+  myVoteHandler,
+  voteListHandler,
+  voteHandler
 };

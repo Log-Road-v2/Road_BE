@@ -4,9 +4,7 @@ import vote from "./vote"
 import project from './project';
 import user from './user';
 import contest from './contest';
-import vote from "./vote"
-import project from './project';
-import user from './user';
+import vote from './vote';
 
 const app = express();
 

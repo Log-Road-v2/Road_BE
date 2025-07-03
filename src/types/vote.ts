@@ -1,5 +1,15 @@
 import { Author } from '../config/prisma';
 
+export interface myVoteItem {
+  id: string;
+  projectId: string;
+  rank: string;
+}
+
+export interface myVoteResponse {
+  project: myVoteItem[];
+}
+
 export interface voteListResponse {
   contestId: string;
   name: string;
@@ -19,20 +29,11 @@ export interface Project {
   image: string;
 }
 
-export interface MyVoteResponse {
-  contestId: bigint;
-  project: MyVoteProject[];
-}
-
-interface MyVoteProject {
-  id: bigint;
-  projectId: number;
-  rank: number;
-}
-
 export interface VoteItem {
   projectId: bigint;
   rank: number;
 }
 
-export type VoteResponse = VoteItem[];
+export interface VoteRequest {
+  votes: VoteItem[];
+}
