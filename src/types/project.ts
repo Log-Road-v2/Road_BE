@@ -73,6 +73,7 @@ export interface GetProjectDetailResponse {
   image: string | null;
   video: string | null;
   state: ProjectState;
+  feedback: string | null;
 }
 
 export interface GetDraftProjectResponse {
