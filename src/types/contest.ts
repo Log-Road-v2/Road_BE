@@ -1,3 +1,8 @@
+export interface ContestParams {
+  [key: string]: string;
+  contestId: string;
+}
+
 export interface ContestResponse {
   contests: ContestData[];
 }

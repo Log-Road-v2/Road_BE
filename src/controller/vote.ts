@@ -3,11 +3,10 @@ import vote from '../service/vote';
 import { getApiLimit } from '../middleware/limit';
 import { verifyJWT } from '../middleware/jwt';
 
-const app = express();
-app.use(express.json());
+const app = express.Router();
 
-app.get('/:contestId', verifyJWT, getApiLimit, vote.voteListHandler);
 app.get('/myvote/:contestId', verifyJWT, getApiLimit, vote.myVoteHandler);
+app.get('/:contestId', verifyJWT, getApiLimit, vote.voteListHandler);
 app.put('/:contestId', verifyJWT, getApiLimit, vote.voteHandler);
 
 export default app;

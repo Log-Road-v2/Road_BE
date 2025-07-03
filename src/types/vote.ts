@@ -1,10 +1,5 @@
 import { Author } from '../config/prisma';
 
-export interface ContestParams {
-  [key: string]: string;
-  contestId: string;
-}
-
 export interface MyVoteItem {
   id: string;
   projectId: string;
