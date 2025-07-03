@@ -33,10 +33,10 @@ const getProjectDetail = async (
 ) => {
   try {
     const userId = req.userId ?? undefined;
-    const { projectId } = req.params;
+    const projectId = BigInt(req.params.projectId);
 
     const project = await prisma.project.findUnique({
-      where: { id: BigInt(projectId) },
+      where: { id: projectId },
       select: {
         projectName: true,
         authorCategory: true,
@@ -60,13 +60,19 @@ const getProjectDetail = async (
           where: { userId },
           select: { id: true },
           take: 1
-        }
+        },
+        feedback: { select: { content: true } }
       }
     });
 
     if (!project) {
       return res.status(404).json({
         message: '요청한 정보가 존재하지 않습니다'
+      });
+    }
+    if (project.state !== 'APPROVAL' && project.writerId !== userId) {
+      return res.status(403).json({
+        message: '프로젝트 조회 권한이 없습니다'
       });
     }
 
@@ -88,7 +94,8 @@ const getProjectDetail = async (
       endDate: formatDate(project.endDate),
       image: buildFileUrl(project.image),
       video: buildFileUrl(project.video),
-      state: project.state
+      state: project.state,
+      feedback: project.feedback ? project.feedback.content : null
     };
 
     return res.status(200).json(result);

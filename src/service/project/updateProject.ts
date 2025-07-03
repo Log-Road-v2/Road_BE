@@ -2,27 +2,36 @@ import { prisma } from '../../config/prisma';
 import { ProjectState } from '@prisma/client';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
-import { RegisterProjectBody, RequestUser, ProjectIdParam } from '../../types/project';
+import { RegisterProjectBody, ProjectIdParam } from '../../types/project';
 import { validateProjectInput } from '../../utils/validation';
 import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 글 수정
 
-export const updateProjectHandler: RequestHandler<
-  ProjectIdParam,
-  RegisterProjectBody | BasicResponse | RequestUser
-> = async (req, res) => {
+export const updateProjectHandler: RequestHandler<ProjectIdParam, RegisterProjectBody | BasicResponse> = async (
+  req,
+  res
+) => {
   await updateProject(req, res);
 };
 
 const updateProject = async (
-  req: Request<ProjectIdParam, RegisterProjectBody | BasicResponse | RequestUser>,
+  req: Request<ProjectIdParam, RegisterProjectBody | BasicResponse>,
   res: Response<BasicResponse | RegisterProjectBody>
 ) => {
   try {
     const userId = req.userId;
+
     const { projectId: rawProjectId } = req.params;
+    if (!rawProjectId) {
+      return res.status(400).json({ message: '잘못된 프로젝트 ID입니다' });
+    }
+
     const { contestId: rawContestId } = req.body;
+    if (!rawContestId) {
+      return res.status(400).json({ message: '잘못된 대회 ID입니다.' });
+    }
+
     const { projectName, authorCategory, teamName, introduction, description, startDate, endDate } = req.body;
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
@@ -40,12 +49,8 @@ const updateProject = async (
       return res.status(400).json({ message: validationResult.message || '' });
     }
 
-    const projectId = BigInt(rawProjectId || '0');
+    const projectId = BigInt(rawProjectId);
     const contestId = BigInt(rawContestId);
-
-    if (!contestId) {
-      return res.status(400).json({ message: '잘못된 대회 ID입니다.' });
-    }
 
     const [existingProject, contest] = await Promise.all([
       prisma.project.findUnique({ where: { id: projectId } }),

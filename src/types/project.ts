@@ -73,6 +73,7 @@ export interface GetProjectDetailResponse {
   image: string | null;
   video: string | null;
   state: ProjectState;
+  feedback: string | null;
 }
 
 export interface GetDraftProjectResponse {
@@ -122,10 +123,6 @@ export interface StudentDetail {
 export interface ProjectIdParam {
   [key: string]: string;
   projectId: string;
-}
-
-export interface RequestUser {
-  userId: string;
 }
 
 export interface GetArchivesParam {

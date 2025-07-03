@@ -1,26 +1,25 @@
 import { prisma } from '../../config/prisma';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
-import { GetDraftProjectResponse, ProjectIdParam, RequestUser } from '../../types/project';
+import { GetDraftProjectResponse, ProjectIdParam } from '../../types/project';
 import { formatDate, formatMembers } from '../../utils/regex';
 import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 임시저장 불러오기
 export const loadTempSavedProjectHandler: RequestHandler<
   ProjectIdParam,
-  GetDraftProjectResponse | BasicResponse,
-  RequestUser
+  GetDraftProjectResponse | BasicResponse
 > = async (req, res) => {
   await loadTempSavedProject(req, res);
 };
 
 const loadTempSavedProject = async (
-  req: Request<ProjectIdParam, GetDraftProjectResponse | BasicResponse, RequestUser>,
+  req: Request<ProjectIdParam, GetDraftProjectResponse | BasicResponse>,
   res: Response<BasicResponse | GetDraftProjectResponse>
 ) => {
   try {
-    const userId = req.userId?.toString();
-    const { projectId } = req.params;
+    const userId = req.userId;
+    const projectId = BigInt(req.params.projectId);
 
     if (!userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
@@ -46,11 +45,11 @@ const loadTempSavedProject = async (
   }
 };
 
-const fetchDraftProject = async (projectId: string, userId: string) => {
+const fetchDraftProject = async (projectId: bigint, userId: bigint) => {
   return await prisma.project.findFirst({
     where: {
-      id: BigInt(projectId),
-      writerId: BigInt(userId),
+      id: projectId,
+      writerId: userId,
       state: 'WRITING'
     },
     select: {
