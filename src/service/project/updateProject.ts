@@ -21,8 +21,17 @@ const updateProject = async (
 ) => {
   try {
     const userId = req.userId;
+
     const { projectId: rawProjectId } = req.params;
+    if (!rawProjectId) {
+      return res.status(400).json({ message: '잘못된 프로젝트 ID입니다' });
+    }
+
     const { contestId: rawContestId } = req.body;
+    if (!rawContestId) {
+      return res.status(400).json({ message: '잘못된 대회 ID입니다.' });
+    }
+
     const { projectName, authorCategory, teamName, introduction, description, startDate, endDate } = req.body;
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
@@ -42,13 +51,6 @@ const updateProject = async (
 
     const projectId = BigInt(rawProjectId);
     const contestId = BigInt(rawContestId);
-
-    if (!projectId) {
-      return res.status(400).json({ message: '잘못된 프로젝트 ID입니다' });
-    }
-    if (!contestId) {
-      return res.status(400).json({ message: '잘못된 대회 ID입니다.' });
-    }
 
     const [existingProject, contest] = await Promise.all([
       prisma.project.findUnique({ where: { id: projectId } }),
