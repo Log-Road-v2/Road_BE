@@ -78,11 +78,11 @@ const ranking = async (
       authorCategory: project.authorCategory,
       introduction: project.introduction,
       image: project.image,
-      award: project.awardProject.length > 0 ? project.awardProject[0].award.name : ''
+      award: project.awardProject.map((ap) => ap.award.name).join(', ')
     }));
 
     const formattedAwards: AwardResponse[] = awards.map((award) => ({
-      name: contest.name
+      name: award.name
     }));
 
     const response: getRankResponse = {
