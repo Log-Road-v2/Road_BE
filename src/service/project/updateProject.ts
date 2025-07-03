@@ -40,9 +40,12 @@ const updateProject = async (
       return res.status(400).json({ message: validationResult.message || '' });
     }
 
-    const projectId = BigInt(rawProjectId || '0');
+    const projectId = BigInt(rawProjectId);
     const contestId = BigInt(rawContestId);
 
+    if (!projectId) {
+      return res.status(400).json({ message: '잘못된 프로젝트 ID입니다' });
+    }
     if (!contestId) {
       return res.status(400).json({ message: '잘못된 대회 ID입니다.' });
     }
