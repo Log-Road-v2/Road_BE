@@ -2,18 +2,16 @@ import { prisma } from '../../config/prisma';
 import { Request, RequestHandler, Response } from 'express';
 import { BasicResponse } from '../../types';
 import { AwardResponse, RankProjectResponse, getRankResponse } from '../../types/project';
+import { ContestParams } from '../../types/contest';
 
 // 수상작 조회
 
-export const rankingHandler: RequestHandler<{ contestId: string }, BasicResponse | getRankResponse, unknown> = async (
-  req,
-  res
-) => {
+export const rankingHandler: RequestHandler<ContestParams, BasicResponse | getRankResponse> = async (req, res) => {
   await ranking(req, res);
 };
 
 const ranking = async (
-  req: Request<{ contestId: string }, BasicResponse | getRankResponse, unknown>,
+  req: Request<ContestParams, BasicResponse | getRankResponse>,
   res: Response<BasicResponse | getRankResponse>
 ) => {
   try {

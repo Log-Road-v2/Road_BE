@@ -1,5 +1,5 @@
 import { prisma } from '../../config/prisma';
-import { RequestHandler, Response, Request } from 'express';
+import { RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { ContestResponse, ContestData } from '../../types/contest';
 import { formatDate } from '../../utils/regex';
@@ -15,7 +15,7 @@ export const getContestList: RequestHandler<unknown, ContestResponse | BasicResp
         startDate: true,
         endDate: true
       },
-      orderBy: { id: 'asc' }
+      orderBy: { startDate: 'asc' }
     });
 
     const formattedContests: ContestData[] = contests.map((contest) => ({

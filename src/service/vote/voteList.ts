@@ -3,16 +3,15 @@ import { prisma } from '../../config/prisma';
 import { VoteListResponse } from '../../types/vote';
 import { BasicResponse } from '../../types';
 import { Project } from '../../types/vote';
+import { buildFileUrl } from '../../utils/buildFileUrl';
+import { ContestParams } from '../../types/contest';
 
-export const voteListHandler: RequestHandler<{ contestId: string }, BasicResponse | VoteListResponse, unknown> = async (
-  req,
-  res
-) => {
+export const voteListHandler: RequestHandler<ContestParams, BasicResponse | VoteListResponse> = async (req, res) => {
   await voteList(req, res);
 };
 
 const voteList = async (
-  req: Request<{ contestId: string }, BasicResponse | VoteListResponse, unknown>,
+  req: Request<ContestParams, BasicResponse | VoteListResponse>,
   res: Response<BasicResponse | VoteListResponse>
 ) => {
   try {
@@ -37,7 +36,7 @@ const voteList = async (
       projectName: p.projectName,
       authorCategory: p.authorCategory,
       introduction: p.introduction || '',
-      image: p.image || ''
+      image: buildFileUrl(p.image)
     }));
 
     const result: VoteListResponse = {

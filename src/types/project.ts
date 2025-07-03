@@ -147,11 +147,6 @@ export interface ProjectIdParam {
   projectId: string;
 }
 
-export interface GetArchivesParam {
-  [key: string]: string;
-  contestId: string;
-}
-
 export interface ValidationSuccess {
   valid: true;
   filteredSkills: string[];

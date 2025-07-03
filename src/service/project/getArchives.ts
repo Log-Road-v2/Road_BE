@@ -1,16 +1,17 @@
 import { prisma } from '../../config/prisma';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
-import { GetArchivesResponse, ProjectResponse, GetArchivesParam, SearchProjectQuery } from '../../types/project';
+import { GetArchivesResponse, ProjectResponse, SearchProjectQuery } from '../../types/project';
 import { formatDate } from '../../utils/regex';
 import { buildFileUrl } from '../../utils/buildFileUrl';
+import { ContestParams } from '../../types/contest';
 
 // 아카이브 조회
 
 const PAGE_SIZE = 10;
 
 export const archivesHandler: RequestHandler<
-  GetArchivesParam,
+  ContestParams,
   GetArchivesResponse | BasicResponse,
   unknown,
   SearchProjectQuery
@@ -19,7 +20,7 @@ export const archivesHandler: RequestHandler<
 };
 
 const getArchives = async (
-  req: Request<GetArchivesParam, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery>,
+  req: Request<ContestParams, GetArchivesResponse | BasicResponse, unknown, SearchProjectQuery>,
   res: Response<BasicResponse | GetArchivesResponse>
 ) => {
   try {

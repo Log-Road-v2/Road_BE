@@ -2,16 +2,14 @@ import { Request, RequestHandler, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { MyVoteResponse } from '../../types/vote';
 import { BasicResponse } from '../../types';
+import { ContestParams } from '../../types/contest';
 
-export const myVoteHandler: RequestHandler<{ contestId: string }, BasicResponse | MyVoteResponse, unknown> = async (
-  req,
-  res
-) => {
+export const myVoteHandler: RequestHandler<ContestParams, BasicResponse | MyVoteResponse> = async (req, res) => {
   await voteList(req, res);
 };
 
 const voteList = async (
-  req: Request<{ contestId: string }, BasicResponse | MyVoteResponse, unknown>,
+  req: Request<ContestParams, BasicResponse | MyVoteResponse>,
   res: Response<BasicResponse | MyVoteResponse>
 ) => {
   try {
