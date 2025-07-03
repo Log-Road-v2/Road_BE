@@ -139,6 +139,7 @@ model Vote {
   id        Int     @id @default(autoincrement())
   projectId BigInt  @db.BigInt
   userId    BigInt  @db.BigInt
+  contestId  BigInt   @db.BigInt
   rank      String  @db.VarChar(1)
 
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
