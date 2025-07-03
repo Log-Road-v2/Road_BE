@@ -1,21 +1,20 @@
 import { prisma } from '../../config/prisma';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
-import { GetDraftProjectResponse, ProjectIdParam, RequestUser } from '../../types/project';
+import { GetDraftProjectResponse, ProjectIdParam } from '../../types/project';
 import { formatDate, formatMembers } from '../../utils/regex';
 import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 임시저장 불러오기
 export const loadTempSavedProjectHandler: RequestHandler<
   ProjectIdParam,
-  GetDraftProjectResponse | BasicResponse,
-  RequestUser
+  GetDraftProjectResponse | BasicResponse
 > = async (req, res) => {
   await loadTempSavedProject(req, res);
 };
 
 const loadTempSavedProject = async (
-  req: Request<ProjectIdParam, GetDraftProjectResponse | BasicResponse, RequestUser>,
+  req: Request<ProjectIdParam, GetDraftProjectResponse | BasicResponse>,
   res: Response<BasicResponse | GetDraftProjectResponse>
 ) => {
   try {

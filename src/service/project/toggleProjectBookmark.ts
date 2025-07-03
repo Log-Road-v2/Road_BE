@@ -1,18 +1,15 @@
 import { prisma } from '../../config/prisma';
 import { BasicResponse } from '../../types';
 import { Request, RequestHandler, Response } from 'express';
-import { ProjectIdParam, RequestUser } from '../../types/project';
+import { ProjectIdParam } from '../../types/project';
 
 // 북마크
 
-export const toggleProjectBookmarkHandler: RequestHandler<ProjectIdParam, unknown, RequestUser> = async (req, res) => {
+export const toggleProjectBookmarkHandler: RequestHandler<ProjectIdParam> = async (req, res) => {
   await toggleProjectBookmark(req, res);
 };
 
-const toggleProjectBookmark = async (
-  req: Request<ProjectIdParam, unknown, RequestUser>,
-  res: Response<BasicResponse>
-) => {
+const toggleProjectBookmark = async (req: Request<ProjectIdParam, unknown>, res: Response<BasicResponse>) => {
   try {
     const userId = req.userId;
     const rawProjectId = req.params.projectId;

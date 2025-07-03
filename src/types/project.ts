@@ -125,10 +125,6 @@ export interface ProjectIdParam {
   projectId: string;
 }
 
-export interface RequestUser {
-  userId: string;
-}
-
 export interface GetArchivesParam {
   [key: string]: string;
   contestId: string;

@@ -2,21 +2,21 @@ import { prisma } from '../../config/prisma';
 import { ProjectState } from '@prisma/client';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
-import { RegisterProjectBody, RequestUser, ProjectIdParam } from '../../types/project';
+import { RegisterProjectBody, ProjectIdParam } from '../../types/project';
 import { validateProjectInput } from '../../utils/validation';
 import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 글 수정
 
-export const updateProjectHandler: RequestHandler<
-  ProjectIdParam,
-  RegisterProjectBody | BasicResponse | RequestUser
-> = async (req, res) => {
+export const updateProjectHandler: RequestHandler<ProjectIdParam, RegisterProjectBody | BasicResponse> = async (
+  req,
+  res
+) => {
   await updateProject(req, res);
 };
 
 const updateProject = async (
-  req: Request<ProjectIdParam, RegisterProjectBody | BasicResponse | RequestUser>,
+  req: Request<ProjectIdParam, RegisterProjectBody | BasicResponse>,
   res: Response<BasicResponse | RegisterProjectBody>
 ) => {
   try {
