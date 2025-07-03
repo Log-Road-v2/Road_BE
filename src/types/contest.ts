@@ -1,10 +1,10 @@
 export interface ContestResponse {
-  contests: ContestData[]
+  contests: ContestData[];
 }
 
 export interface ContestData {
-  id: string,
-  name: string,
-  startDate: string | Date,
-  endDate: string | Date
+  id: string;
+  name: string;
+  startDate: string | Date;
+  endDate: string | Date;
 }
