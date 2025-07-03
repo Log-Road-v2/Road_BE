@@ -1,20 +1,19 @@
 import { Request, RequestHandler, Response } from 'express';
 import { prisma } from '../../config/prisma';
-import { voteListResponse } from '../../types/vote';
+import { VoteListResponse } from '../../types/vote';
 import { BasicResponse } from '../../types';
 import { Project } from '../../types/vote';
 
-export const voteListHandler: RequestHandler<
-  { contestId: string },
-  BasicResponse | voteListResponse,
-  unknown
-> = async (req, res) => {
+export const voteListHandler: RequestHandler<{ contestId: string }, BasicResponse | VoteListResponse, unknown> = async (
+  req,
+  res
+) => {
   await voteList(req, res);
 };
 
 const voteList = async (
-  req: Request<{ contestId: string }, BasicResponse | voteListResponse, unknown>,
-  res: Response<BasicResponse | voteListResponse>
+  req: Request<{ contestId: string }, BasicResponse | VoteListResponse, unknown>,
+  res: Response<BasicResponse | VoteListResponse>
 ) => {
   try {
     const contestId = BigInt(req.params.contestId);
@@ -41,7 +40,7 @@ const voteList = async (
       image: p.image || ''
     }));
 
-    const result: voteListResponse = {
+    const result: VoteListResponse = {
       contestId: contest.id.toString(),
       name: contest.name,
       awards: contest.award,

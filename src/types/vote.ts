@@ -1,16 +1,16 @@
 import { Author } from '../config/prisma';
 
-export interface myVoteItem {
+export interface MyVoteItem {
   id: string;
   projectId: string;
   rank: string;
 }
 
-export interface myVoteResponse {
-  project: myVoteItem[];
+export interface MyVoteResponse {
+  project: MyVoteItem[];
 }
 
-export interface voteListResponse {
+export interface VoteListResponse {
   contestId: string;
   name: string;
   awards: Award[];
