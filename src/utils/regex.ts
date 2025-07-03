@@ -10,7 +10,10 @@ export const checkPasswordRegex = (password: string): boolean => {
   return passwordPattern.test(password);
 };
 
-export const formatDate = (date: Date | string) => date.toString().split("T")[0];
+export const formatDate = (date: Date | string) => {
+  const isoString = typeof date === 'string' ? date : date.toISOString();
+  return isoString.split("T")[0];
+}
 
 export const formatMembers = <
   T extends { studentId: unknown; student?: { name?: string } | null }

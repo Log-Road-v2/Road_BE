@@ -6,13 +6,19 @@ import { formatDate } from '../../utils/regex';
 import { buildFileUrl } from '../../utils/buildFileUrl';
 
 // 프로젝트 상세 조회
-const parseSkills = (skills?: string): string[] =>
-  skills
-    ?.split(',')
-    .map((s) => s.trim())
-    .filter(Boolean) || [];
 
-const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
+const parseSkills = (skills?: string): string[] => {
+  if (!skills) return [];
+
+  try {
+    const parsed = JSON.parse(skills);
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return skills.split(",").map(s => s.trim()).filter(Boolean);
+  }
+};
+
+  const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
   members
     .filter(({ student }) => student !== null)
     .map(({ student }) => ({
