@@ -85,9 +85,6 @@ const updateProject = async (
         where: { id: projectId, user: { id: userId } },
         data: updateData
       });
-      if (existingProject.state === 'REJECTED') {
-        await prisma.feedback.delete({ where: { projectId: existingProject.id } });
-      }
 
       await tx.member.deleteMany({ where: { projectId: updated.id } });
 
