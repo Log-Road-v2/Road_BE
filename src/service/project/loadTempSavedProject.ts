@@ -19,8 +19,8 @@ const loadTempSavedProject = async (
   res: Response<BasicResponse | GetDraftProjectResponse>
 ) => {
   try {
-    const userId = req.userId?.toString();
-    const { projectId } = req.params;
+    const userId = req.userId;
+    const projectId = BigInt(req.params.projectId);
 
     if (!userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
@@ -46,11 +46,11 @@ const loadTempSavedProject = async (
   }
 };
 
-const fetchDraftProject = async (projectId: string, userId: string) => {
+const fetchDraftProject = async (projectId: bigint, userId: bigint) => {
   return await prisma.project.findFirst({
     where: {
-      id: BigInt(projectId),
-      writerId: BigInt(userId),
+      id: projectId,
+      writerId: userId,
       state: 'WRITING'
     },
     select: {

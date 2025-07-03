@@ -14,10 +14,10 @@ const toggleProjectBookmark = async (
   res: Response<BasicResponse>
 ) => {
   try {
-    const rawUserId = req.userId;
+    const userId = req.userId;
     const rawProjectId = req.params.projectId;
 
-    if (!rawUserId) {
+    if (!userId) {
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
 
@@ -26,7 +26,6 @@ const toggleProjectBookmark = async (
     }
 
     const projectId = BigInt(rawProjectId);
-    const userId = BigInt(rawUserId);
 
     const project = await prisma.project.findUnique({ where: { id: projectId } });
     if (!project) {

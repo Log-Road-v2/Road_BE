@@ -24,14 +24,14 @@ const getArchives = async (
 ) => {
   try {
     const userId = req.userId ?? undefined;
-    const { contestId } = req.params;
+    const contestId = BigInt(req.params.contestId);
 
     const rawOffset = Number(req.query.offset);
     const offset = Number.isInteger(rawOffset) && rawOffset > 0 ? rawOffset : 1;
     const skip = PAGE_SIZE * (offset - 1);
 
     const contest = await prisma.contest.findUnique({
-      where: { id: BigInt(contestId) },
+      where: { id: contestId },
       select: {
         id: true,
         name: true,
@@ -61,13 +61,13 @@ const getArchives = async (
             }
           })
         },
-        where: { contestId: BigInt(contestId) },
+        where: { contestId: contestId },
         skip,
         take: PAGE_SIZE,
         orderBy: { projectName: 'asc' }
       }),
       prisma.project.count({
-        where: { contestId: BigInt(contestId) }
+        where: { contestId: contestId }
       })
     ]);
 

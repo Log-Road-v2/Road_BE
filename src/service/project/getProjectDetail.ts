@@ -33,10 +33,10 @@ const getProjectDetail = async (
 ) => {
   try {
     const userId = req.userId ?? undefined;
-    const { projectId } = req.params;
+    const projectId = BigInt(req.params.projectId);
 
     const project = await prisma.project.findUnique({
-      where: { id: BigInt(projectId) },
+      where: { id: projectId },
       select: {
         projectName: true,
         authorCategory: true,
