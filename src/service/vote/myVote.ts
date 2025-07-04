@@ -27,11 +27,6 @@ const voteList = async (
         rank: true
       }
     });
-    if (votes.length === 0) {
-      return res.status(404).json({
-        message: '투표한 프로젝트가 없습니다.'
-      });
-    }
 
     const result: MyVoteResponse = {
       project: votes.map((vote: any) => ({
