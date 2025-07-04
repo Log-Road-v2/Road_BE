@@ -11,10 +11,9 @@ export const toggleProjectBookmarkHandler: RequestHandler<ProjectIdParam> = asyn
 
 const toggleProjectBookmark = async (req: Request<ProjectIdParam, unknown>, res: Response<BasicResponse>) => {
   try {
-    const userId = req.userId;
     const rawProjectId = req.params.projectId;
 
-    if (!userId) {
+    if (!req.userId) {
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
 
@@ -22,7 +21,8 @@ const toggleProjectBookmark = async (req: Request<ProjectIdParam, unknown>, res:
       return res.status(400).json({ message: '프로젝트 아이디가 유효하지 않습니다.' });
     }
 
-    const projectId = BigInt(rawProjectId);
+    const userId = BigInt(req.userId);
+    const projectId = BigInt(rawProjectId); 
 
     const project = await prisma.project.findUnique({ where: { id: projectId } });
     if (!project) {

@@ -31,7 +31,7 @@ const getBookmarkedProjects = async (
 
     const [marks, total] = await prisma.$transaction([
       prisma.mark.findMany({
-        where: { userId },
+        where: { userId: BigInt(userId), },
         skip,
         take: PAGE_SIZE,
         orderBy: { id: 'asc' },
@@ -47,7 +47,7 @@ const getBookmarkedProjects = async (
           }
         }
       }),
-      prisma.mark.count({ where: { userId } })
+      prisma.mark.count({ where: { userId: BigInt(userId) } })
     ]);
 
     const projects: ProjectResponse[] = marks.map(({ project }) => ({

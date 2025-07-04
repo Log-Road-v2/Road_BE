@@ -16,10 +16,11 @@ const getJoinedProjects = async (
   res: Response<BasicResponse | GetProjectResponse>
 ) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
+    if (!req.userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
     }
+    
+    const userId = BigInt(req.userId);
 
     const projects = await prisma.project.findMany({
       select: {
