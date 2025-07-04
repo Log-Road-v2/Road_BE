@@ -7,9 +7,8 @@ import path from 'path';
 configDotenv();
 const port: Number = Number(process.env.PORT!) || 8080;
 const corsOptions: CorsOptions = {
-  origin: 'localhost',
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
 };
 
 const app = express();
