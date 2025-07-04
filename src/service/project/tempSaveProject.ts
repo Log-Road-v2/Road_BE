@@ -11,15 +11,14 @@ export const tempSaveProjectHandler: RequestHandler<unknown, BasicResponse, Regi
   await tempSaveProject(req, res);
 };
 
-const tempSaveProject = async (
-  req: Request<unknown, BasicResponse, RegisterProjectBody>,
-  res: Response<BasicResponse>
-) => {
+const tempSaveProject = async (req: Request<unknown, BasicResponse>, res: Response<BasicResponse>) => {
   try {
     const userId = req.userId;
     if (!userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
     }
+
+    const reqBody = JSON.parse(req.body.data) as RegisterProjectBody;
 
     const {
       projectId: rawProjectId,
@@ -33,11 +32,11 @@ const tempSaveProject = async (
       startDate,
       endDate,
       skills
-    } = req.body;
+    } = reqBody;
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    const image = files?.['image'][0] ?? null;
-    const video = files?.['video'][0] ?? null;
+    const image = files?.['image'] ? files?.['image'][0] : null;
+    const video = files?.['video'] ? files?.['video'][0] : null;
     const imageUri = image ? getRelativePath(image.path) : null;
     const videoUri = video ? getRelativePath(video.path) : null;
 

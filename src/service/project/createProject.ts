@@ -6,14 +6,11 @@ import { validateProjectInput } from '../../utils/validation';
 import { getRelativePath } from '../../utils/format';
 
 // 프로젝트 생성
-export const createProjectHandler: RequestHandler<unknown, BasicResponse, RegisterProjectBody> = async (req, res) => {
+export const createProjectHandler: RequestHandler<unknown, BasicResponse> = async (req, res) => {
   await createProject(req, res);
 };
 
-const createProject = async (
-  req: Request<unknown, BasicResponse, RegisterProjectBody>,
-  res: Response<BasicResponse>
-) => {
+const createProject = async (req: Request<unknown, BasicResponse>, res: Response<BasicResponse>) => {
   try {
     const userId = req.userId;
     if (!userId) {
@@ -22,28 +19,26 @@ const createProject = async (
       });
     }
 
-    const validationResult = validateProjectInput(req.body);
+    const reqBody = JSON.parse(req.body.data) as RegisterProjectBody;
+
+    const validationResult = validateProjectInput(reqBody);
 
     if (!validationResult.valid) {
       return res.status(400).json({ message: validationResult.message || '' });
     }
 
     const projectId = req.body.projectId ? BigInt(req.body.projectId) : null;
-    const contestId = BigInt(req.body.contestId);
+    const contestId = BigInt(reqBody.contestId);
     const filteredSkills = validationResult.filteredSkills || [];
     const filteredMembers = validationResult.filteredMembers || [];
 
-    const { projectName, authorCategory, teamName, introduction, description, startDate, endDate } = req.body;
+    const { projectName, authorCategory, teamName, introduction, description, startDate, endDate } = reqBody;
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    const image = files?.['image'][0] ?? null;
-    const video = files?.['video'][0] ?? null;
+    const image = files?.['image'] ? files?.['image'][0] : null;
+    const video = files?.['video'] ? files?.['video'][0] : null;
     const imageUri = image ? getRelativePath(image.path) : null;
     const videoUri = video ? getRelativePath(video.path) : null;
-
-    if (!contestId || !projectName || !authorCategory || !startDate || !endDate) {
-      return res.status(400).json({ message: '필수 입력값이 누락되었습니다.' });
-    }
 
     const contest = await prisma.contest.findUnique({
       where: { id: contestId }
@@ -52,23 +47,6 @@ const createProject = async (
     if (!contest) {
       return res.status(404).json({
         message: '해당 대회를 찾을 수 없습니다.'
-      });
-    }
-
-    const now = new Date();
-    if (now < new Date(contest.startDate)) {
-      return res.status(400).json({ message: '아직 제출 기간이 아닙니다.' });
-    }
-
-    if (new Date(contest.endDate) < now) {
-      return res.status(400).json({
-        message: '이미 마감된 대회에는 프로젝트를 제출할 수 없습니다.'
-      });
-    }
-
-    if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
-      return res.status(400).json({
-        message: '시작일과 종료일을 올바르게 입력해주세요.'
       });
     }
 
