@@ -57,7 +57,7 @@ export interface GetArchivesResponse {
   projects: ProjectResponse[];
 }
 
-export interface getRankResponse {
+export interface GetRankResponse {
   contestId: string;
   name: string;
   startDate: Date | string;
