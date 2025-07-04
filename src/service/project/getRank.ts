@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { ContestState, prisma, ProjectState } from '../../config/prisma';
 import { Request, RequestHandler, Response } from 'express';
 import { BasicResponse } from '../../types';
 import { AwardResponse, RankProjectResponse, GetRankResponse } from '../../types/project';
@@ -22,7 +22,7 @@ const ranking = async (
     }
 
     const contest = await prisma.contest.findUnique({
-      where: { id: contestId, state: 'FINISHED' },
+      where: { id: contestId, state: ContestState.FINISHED },
       select: {
         id: true,
         name: true,
@@ -52,7 +52,8 @@ const ranking = async (
                 image: true
               }
             }
-          }
+          },
+          where: { project: { state: ProjectState.APPROVAL } }
         }
       }
     });

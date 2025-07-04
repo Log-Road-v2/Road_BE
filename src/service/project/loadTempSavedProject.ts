@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { prisma, ProjectState } from '../../config/prisma';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { GetDraftProjectResponse, ProjectIdParam } from '../../types/project';
@@ -50,7 +50,7 @@ const fetchDraftProject = async (projectId: bigint, userId: bigint) => {
     where: {
       id: projectId,
       writerId: userId,
-      state: 'WRITING'
+      state: ProjectState.WRITING
     },
     select: {
       contestId: true,

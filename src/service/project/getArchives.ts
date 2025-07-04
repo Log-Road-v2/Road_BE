@@ -62,13 +62,13 @@ const getArchives = async (
             }
           })
         },
-        where: { contestId: contestId, state: 'APPROVAL' },
+        where: { contestId: contestId, state: ProjectState.APPROVAL },
         skip,
         take: PAGE_SIZE,
         orderBy: { projectName: 'asc' }
       }),
       prisma.project.count({
-        where: { contestId: contestId, state: 'APPROVAL' }
+        where: { contestId: contestId, state: ProjectState.APPROVAL }
       })
     ]);
 

@@ -16,11 +16,20 @@ const getJoinedProjects = async (
   res: Response<BasicResponse | GetProjectResponse>
 ) => {
   try {
-    if (!req.userId) {
+    const userId = req.userId;
+    if (!userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
     }
-    
-    const userId = BigInt(req.userId);
+
+    const student = await prisma.student.findUnique({
+      select: { id: true },
+      where: { userId: userId }
+    });
+    if (!student) {
+      return res.status(404).json({
+        message: '학생이 아닙니다'
+      });
+    }
 
     const projects = await prisma.project.findMany({
       select: {
@@ -33,7 +42,7 @@ const getJoinedProjects = async (
       where: {
         AND: [
           {
-            OR: [{ writerId: userId }, { member: { some: { studentId: userId } } }]
+            OR: [{ writerId: userId }, { member: { some: { studentId: student.id } } }]
           }
         ]
       },

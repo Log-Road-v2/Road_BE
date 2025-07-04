@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { Author, prisma } from '../../config/prisma';
 import { RequestHandler, Request, Response } from 'express';
 import { BasicResponse } from '../../types';
 import { RegisterProjectBody } from '../../types/project';
@@ -50,7 +50,7 @@ const createProject = async (req: Request<unknown, BasicResponse>, res: Response
       });
     }
 
-    if (authorCategory === 'TEAM' && !teamName) {
+    if (authorCategory === Author.TEAM && !teamName) {
       return res.status(400).json({
         message: '팀 프로젝트인 경우 팀 이름은 필수입니다.'
       });

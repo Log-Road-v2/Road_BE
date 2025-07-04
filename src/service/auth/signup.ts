@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { prisma, Role } from '../../config/prisma';
 import { Request, RequestHandler, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { checkEmailRegex, checkPasswordRegex } from '../../utils/regex';
@@ -26,7 +26,7 @@ const signUp = async (
       message: '올바르지 않은 입력값'
     });
   }
-  if (!(role === 'STUDENT' || role === 'TEACHER')) {
+  if (!(role === Role.STUDENT || role === Role.TEACHER)) {
     return res.status(400).json({
       message: '회원가입할 수 없는 역할입니다'
     });
@@ -41,7 +41,7 @@ const signUp = async (
       message: '올바르지 않은 비밀번호'
     });
   }
-  if (role === 'STUDENT') {
+  if (role === Role.STUDENT) {
     if (!grade || grade < 1 || grade > 3) {
       return res.status(400).json({
         message: '올바르지 않은 학년'
@@ -73,7 +73,7 @@ const signUp = async (
       });
     }
     let existStudent = null;
-    if (role === 'STUDENT') {
+    if (role === Role.STUDENT) {
       existStudent = await prisma.student.findFirst({ where: { grade, classNumber, studentNumber } });
       if (!existStudent) {
         return res.status(400).json({
@@ -99,7 +99,7 @@ const signUp = async (
         }
       });
 
-      if (role === 'STUDENT') {
+      if (role === Role.STUDENT) {
         await tx.student.update({
           where: { id: existStudent?.id },
           data: { userId: createdUser.id }

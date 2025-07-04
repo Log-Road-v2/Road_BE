@@ -1,5 +1,5 @@
 import { prisma } from '../../config/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, ProjectState } from '@prisma/client';
 import { Response, Request, RequestHandler } from 'express';
 import { BasicResponse } from '../../types';
 import { SearchProjectResponse, ProjectResponse, SearchProjectQuery } from '../../types/project';
@@ -35,9 +35,12 @@ const searchProject = async (
           projectName: {
             contains: keyword,
             mode: Prisma.QueryMode.insensitive
-          }
+          },
+          state: ProjectState.APPROVAL
         }
-      : {};
+      : {
+          state: ProjectState.APPROVAL
+        };
 
     const [projects, totalProjectCount] = await prisma.$transaction([
       prisma.project.findMany({

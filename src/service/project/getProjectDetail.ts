@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { prisma, ProjectState } from '../../config/prisma';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { GetProjectDetailResponse, StudentResponse, ProjectIdParam } from '../../types/project';
@@ -14,11 +14,14 @@ const parseSkills = (skills?: string): string[] => {
     const parsed = JSON.parse(skills);
     return Array.isArray(parsed) ? parsed.map(String) : [];
   } catch {
-    return skills.split(",").map(s => s.trim()).filter(Boolean);
+    return skills
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
 };
 
-  const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
+const mapMembers = (members: { student: { id: bigint; name: string } | null }[]): StudentResponse[] =>
   members
     .filter(({ student }) => student !== null)
     .map(({ student }) => ({
@@ -76,7 +79,7 @@ const getProjectDetail = async (
         message: '요청한 정보가 존재하지 않습니다'
       });
     }
-    if (project.state !== 'APPROVAL' && project.writerId !== userId) {
+    if (project.state !== ProjectState.APPROVAL && project.writerId !== userId) {
       return res.status(403).json({
         message: '프로젝트 조회 권한이 없습니다'
       });

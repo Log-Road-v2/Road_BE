@@ -21,6 +21,9 @@ const updateProject = async (
 ) => {
   try {
     const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: '토큰 검증 실패' });
+    }
 
     const { projectId: rawProjectId } = req.params;
     if (!rawProjectId) {
@@ -39,10 +42,6 @@ const updateProject = async (
     const video = files?.['video'][0] ?? null;
     const imageUri = image ? getRelativePath(image.path) : null;
     const videoUri = video ? getRelativePath(video.path) : null;
-
-    if (!userId) {
-      return res.status(401).json({ message: '토큰 검증 실패' });
-    }
 
     const validationResult = validateProjectInput(req.body);
     if (!validationResult.valid) {

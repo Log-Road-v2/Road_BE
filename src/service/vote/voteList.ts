@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import { prisma } from '../../config/prisma';
+import { ContestState, prisma, ProjectState } from '../../config/prisma';
 import { VoteListResponse } from '../../types/vote';
 import { BasicResponse } from '../../types';
 import { Project } from '../../types/vote';
@@ -21,11 +21,12 @@ const voteList = async (
       select: {
         id: true,
         name: true,
-        award: true
+        award: true,
+        state: true
       },
       where: { id: contestId }
     });
-    if (!contest) {
+    if (!contest || contest.state !== ContestState.VOTING) {
       return res.status(404).json({
         message: '존재하지 않는 대회'
       });
@@ -34,7 +35,7 @@ const voteList = async (
     const projects = await prisma.project.findMany({
       where: {
         contestId: contestId,
-        state: 'APPROVAL'
+        state: ProjectState.APPROVAL
       },
       select: {
         id: true,
