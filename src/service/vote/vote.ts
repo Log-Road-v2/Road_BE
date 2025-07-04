@@ -4,14 +4,11 @@ import { Request, RequestHandler, Response } from 'express';
 import { VoteRequest } from '../../types/vote';
 import { ContestParams } from '../../types/contest';
 
-export const voteHandler: RequestHandler<ContestParams, BasicResponse | VoteRequest> = async (req, res) => {
+export const voteHandler: RequestHandler<ContestParams, BasicResponse, VoteRequest> = async (req, res) => {
   await vote(req, res);
 };
 
-const vote = async (
-  req: Request<ContestParams, BasicResponse | VoteRequest>,
-  res: Response<BasicResponse | VoteRequest>
-) => {
+const vote = async (req: Request<ContestParams, BasicResponse, VoteRequest>, res: Response<BasicResponse>) => {
   try {
     const contestId = BigInt(req.params.contestId);
 
@@ -26,13 +23,28 @@ const vote = async (
       return res.status(400).json({ message: '투표 정보가 없습니다.' });
     }
 
-    await prisma.vote.createMany({
-      data: votes.map((vote) => ({
-        contestId,
-        userId,
-        projectId: BigInt(vote.projectId),
-        rank: vote.rank.toString()
-      }))
+    const myVotes = await prisma.vote.findMany({
+      where: { userId: userId },
+      select: { id: true }
+    });
+    const myVotesId = myVotes.map((myVote) => myVote.id);
+
+    const votesData: { userId: bigint; projectId: bigint; rank: string }[] = votes.map((v) => ({
+      userId: userId,
+      projectId: BigInt(v.projectId),
+      rank: v.rank.toString()
+    }));
+
+    await prisma.$transaction(async (tx) => {
+      if (myVotes) {
+        await tx.vote.deleteMany({
+          where: { id: { in: myVotesId } }
+        });
+      }
+
+      await tx.vote.createMany({
+        data: votesData
+      });
     });
 
     return res.status(201).json();

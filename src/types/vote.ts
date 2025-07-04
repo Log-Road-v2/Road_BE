@@ -30,7 +30,7 @@ export interface Project {
 }
 
 export interface VoteItem {
-  projectId: bigint;
+  projectId: string;
   rank: number;
 }
 
