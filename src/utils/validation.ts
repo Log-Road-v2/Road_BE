@@ -7,16 +7,8 @@ export function validateProjectInput(body: RegisterProjectBody): ValidationResul
     const { contestId, projectName, authorCategory, skills, members, introduction, description, startDate, endDate } =
       body;
 
-    if (
-      !contestId ||
-      !projectName?.trim() ||
-      !authorCategory ||
-      !introduction?.trim() ||
-      !description?.trim() ||
-      !startDate ||
-      !endDate
-    ) {
-      return { valid: false, message: '필수 입력값이 누락되었습니다.' };
+    if (!contestId || !projectName || !authorCategory || !introduction || !description || !startDate || !endDate) {
+      return { valid: false, message: `필수 입력값이 누락되었습니다` };
     }
 
     if (!isValidDate(startDate) || !isValidDate(endDate)) {
@@ -41,7 +33,7 @@ export function validateProjectInput(body: RegisterProjectBody): ValidationResul
           studentId: BigInt(m.studentId)
         })) || [];
 
-    if (filteredMembers.length === 0) {
+    if (authorCategory === 'TEAM' && filteredMembers.length === 0) {
       return { valid: false, message: '프로젝트 멤버가 유효하지 않습니다.' };
     }
 
