@@ -26,8 +26,8 @@ app.get('/rank/:contestId', getApiLimit, project.rankingHandler);
 app.get('/:contestId', getApiLimit, project.archivesHandler);
 app.post(
   '/',
-  verifyJWT,
   apiLimit,
+  verifyJWT,
   upload.fields([
     { name: 'image', maxCount: 1 },
     { name: 'video', maxCount: 1 }
