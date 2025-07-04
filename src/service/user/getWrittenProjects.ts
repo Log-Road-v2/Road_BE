@@ -23,10 +23,11 @@ export const getWrittenProjects = async (
   res: Response<BasicResponse | GetProjectResponse>
 ) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
+    if (!req.userId) {
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
+
+    const userId = req.userId;
 
     const rawState = req.query.state?.trim().toUpperCase() || 'ALL';
 

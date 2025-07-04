@@ -13,7 +13,7 @@ export const tempSaveProjectHandler: RequestHandler<unknown, BasicResponse, Regi
 
 const tempSaveProject = async (req: Request<unknown, BasicResponse>, res: Response<BasicResponse>) => {
   try {
-    const userId = req.userId;
+    const userId = BigInt(req.userId);
     if (!userId) {
       return res.status(401).json({ message: '토큰 검증 실패' });
     }

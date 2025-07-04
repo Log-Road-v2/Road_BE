@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma';
+import { ProjectState, prisma } from '../../config/prisma';
 import { RequestHandler, Response, Request } from 'express';
 import { BasicResponse } from '../../types';
 import { GetArchivesResponse, ProjectResponse, SearchProjectQuery } from '../../types/project';
