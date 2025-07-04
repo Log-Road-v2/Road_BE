@@ -17,7 +17,6 @@ const toggleProjectBookmark = async (req: Request<ProjectIdParam, unknown>, res:
     if (!userId) {
       return res.status(400).json({ message: '토큰 검증 실패' });
     }
-
     if (!rawProjectId) {
       return res.status(400).json({ message: '프로젝트 아이디가 유효하지 않습니다.' });
     }
@@ -35,11 +34,13 @@ const toggleProjectBookmark = async (req: Request<ProjectIdParam, unknown>, res:
 
     if (existingBookmark) {
       await prisma.mark.delete({ where: { projectId_userId: { projectId, userId } } });
-      return res.status(200).json({ message: '북마크 해제 완료' });
     } else {
       await prisma.mark.create({ data: { projectId, userId } });
-      return res.status(201).json({ message: '북마크 추가 완료' });
     }
+
+    return res.status(200).json({
+      message: `북마크 ${existingBookmark ? '해제' : '추가'} 완료`
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
