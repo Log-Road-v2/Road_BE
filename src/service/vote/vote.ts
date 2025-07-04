@@ -10,12 +10,10 @@ export const voteHandler: RequestHandler<ContestParams, BasicResponse, VoteReque
 
 const vote = async (req: Request<ContestParams, BasicResponse, VoteRequest>, res: Response<BasicResponse>) => {
   try {
-    const contestId = BigInt(req.params.contestId);
-
-    if (!req.userId) {
+    const userId = req.userId;
+    if (!userId) {
       return res.status(401).json({ message: '인증된 사용자만 투표할 수 있습니다.' });
     }
-    const userId = req.userId;
 
     const { votes } = req.body;
 
