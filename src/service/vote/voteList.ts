@@ -16,14 +16,14 @@ const voteList = async (
 ) => {
   try {
     const contestId = BigInt(req.params.contestId);
+
     const contest = await prisma.contest.findUnique({
-      where: { id: contestId },
       select: {
         id: true,
         name: true,
-        award: { select: { name: true } },
-        project: { select: { id: true, projectName: true, authorCategory: true, introduction: true, image: true } }
-      }
+        award: true
+      },
+      where: { id: contestId }
     });
     if (!contest) {
       return res.status(404).json({
@@ -31,7 +31,20 @@ const voteList = async (
       });
     }
 
-    const projects: Project[] = contest.project.map((p) => ({
+    const projects = await prisma.project.findMany({
+      where: {
+        contestId: contestId,
+        state: 'APPROVAL'
+      },
+      select: {
+        id: true,
+        projectName: true,
+        authorCategory: true,
+        introduction: true,
+        image: true
+      }
+    });
+    const projectResult: Project[] = projects.map((p) => ({
       id: p.id.toString(),
       projectName: p.projectName,
       authorCategory: p.authorCategory,
@@ -43,7 +56,7 @@ const voteList = async (
       contestId: contest.id.toString(),
       name: contest.name,
       awards: contest.award,
-      projects: projects
+      projects: projectResult
     };
 
     return res.status(200).json(result);
