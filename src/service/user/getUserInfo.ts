@@ -15,10 +15,11 @@ const getUserInfo = async (
   res: Response<BasicResponse | GetStudentInfoResponse | GetTeacherInfoResponse>
 ) => {
   try {
-    const userId = req.userId;
-    if (!userId) {
+    if (!req.userId) {
       return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
     }
+
+    const userId = BigInt(req.userId);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
